@@ -37,8 +37,8 @@ export default function LoginPage() {
   return (
     <AuthShell
       kicker="Giriş"
-      title="Portala daxil olun"
-      subtitle="Şikayətlərinizin və təyinatlarınızın izini brauzerdən izləyin."
+      title="Hesabınıza daxil olun"
+      subtitle="Elanlarınızı və kömək axınınızı buradan izləyin."
       footer={
         <>
           Hesabınız yoxdur?{' '}

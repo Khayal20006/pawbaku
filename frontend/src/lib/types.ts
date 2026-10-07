@@ -1,4 +1,4 @@
-export type Role = 'CITIZEN' | 'ADMIN' | 'DEPARTMENT_MANAGER' | 'FIELD_EMPLOYEE'
+export type Role = 'CITIZEN' | 'VOLUNTEER' | 'SHELTER_STAFF' | 'VET' | 'MODERATOR' | 'ADMIN'
 
 export type ComplaintStatus =
   | 'PENDING'

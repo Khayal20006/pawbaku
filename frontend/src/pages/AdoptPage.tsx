@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { LinkButton, SectionTitle } from '../components/ui'
-import { PawGlyph } from './HomePage'
+import { PawGlyph } from '../lib/paw'
 
 const FLOW = [
   { title: 'Profil', text: 'Sığınacaq heyvanın profilini paylaşır — şəkil, xarakter, sağlamlıq.', tint: 'bg-brand-50', ring: 'bg-brand-600' },
@@ -106,7 +106,7 @@ export default function AdoptPage() {
               Sığınacaq profili və <span className="text-stroke-white">foster şəbəkəsi</span>
             </h3>
             <p className="mt-3 text-sm font-semibold leading-relaxed text-white/80">
-              İlk versiyada yeniyetmə axın (profil → ərizə → görüş → nəticə) işləyir; sığınacaq
+              İlk versiyada əsas axın (profil → ərizə → görüş → nəticə) işləyir; sığınacaq
               paneli, baytar rəyi və müvəqqəti baxıcı modulu Milestone 2-də aktivləşir.
             </p>
           </div>

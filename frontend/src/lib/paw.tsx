@@ -2,6 +2,21 @@ import type { ReactNode } from 'react'
 
 /** PawBaku domain helpers, status chips and mock data for the Pill 1 frontend. */
 
+export function PawGlyph({ className = 'size-5' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
+      <path
+        d="M12 8.5c-1 2-2.2 3.4-3.6 4.6M12 8.5c1 2 2.2 3.4 3.6 4.6m0-6a1.4 1.4 0 1 0 .01 0m-7.2 0a1.4 1.4 0 1 0 .01 0"
+        strokeLinecap="round"
+      />
+      <path
+        d="M6 18c1 .8 2.4 1.4 3.6 2.2 1 .6 2 .6 2.4.6.4 0 1.4 0 2.4-.6 1.2-.8 2.6-1.4 3.6-2.2"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
 export type ListingKind = 'LOST' | 'FOUND'
 export type ListingStatus = 'ACTIVE' | 'MATCHED' | 'CLOSED'
 export type ReportStatus =
@@ -67,7 +82,7 @@ export const LISTINGS: ListingCard[] = [
       image: '/hero-paw.jpg',
     },
     district: 'Xətai',
-    address: 'Xətai metrosu, "Gənclik" mall yanı',
+    address: 'Xətai metrosu, çıxış yanı',
     eventTime: '2 saat əvvəl',
     matchScore: 87,
   },
@@ -114,7 +129,7 @@ export const LISTINGS: ListingCard[] = [
     animal: {
       name: 'Pəncə',
       species: 'DOG',
-      breed: 'Qızıl quşcuq',
+      breed: 'Qızıl retriver',
       color: 'Qızılı',
       size: 'MEDIUM',
       age: 6,
@@ -137,7 +152,7 @@ export const FEED: FeedItem[] = [
     avatar: 'A',
   },
   {
-    title: 'Aç it',
+    title: 'Ac it',
     description: 'Bazar ətrafında üç gündür yemək axtarır, qorxaq.',
     status: 'VERIFIED',
     district: 'Yasamal',

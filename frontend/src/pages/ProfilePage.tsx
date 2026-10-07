@@ -112,9 +112,9 @@ export default function ProfilePage() {
         </Card>
 
         <Alert tone="info" title="Təhlükəsizlik">
-          Parolu dəyişmək və ya ikiaddımlı doğrulama üçün{' '}
-          <a href="mailto:destek@city.gov.az" className="font-semibold underline">
-            destek@city.gov.az
+          Parol dəyişdirmək üçün{' '}
+          <a href="mailto:komak@pawbaku.az" className="font-semibold underline">
+            komak@pawbaku.az
           </a>{' '}
           ünvanına müraciət edin.
         </Alert>

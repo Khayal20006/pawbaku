@@ -24,7 +24,7 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
-const STAFF_ROLES = ['ADMIN', 'DEPARTMENT_MANAGER', 'FIELD_EMPLOYEE']
+const STAFF_ROLES = ['MODERATOR', 'ADMIN']
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   // Start in the loading state only when a token is actually waiting to be validated.

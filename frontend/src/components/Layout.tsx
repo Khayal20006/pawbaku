@@ -214,7 +214,7 @@ komak@pawbaku.az
                 Paw<em className="font-medium text-brand-400">Baku</em>
               </p>
               <p className="mt-4 max-w-md text-sm leading-relaxed text-white/60">
-                Sahibsiz və itkin heyvanlara vahid platforma — tapılır, sağaldılır, ev tapır.
+                İtkinlər tapılır, zədəlilər sağaldılır, sahibsizlər yeni ev tapır.
               </p>
             </div>
             <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/40">

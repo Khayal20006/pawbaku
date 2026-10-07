@@ -152,7 +152,7 @@ export default function ListingsPage() {
 
       <div className="mt-10 grid gap-4 sm:grid-cols-3">
         {[
-          { value: '50 m', tint: 'text-sea-600', label: 'yer həssaslığı', text: 'Eyni növdə, 50 m radiusda cütləşmə axtarılır.' },
+          { value: '50 m', tint: 'text-sea-600', label: 'yer həssaslığı', text: 'Eyni növdə, 50 m radiusda uyğun elan axtarılır.' },
           { value: '24 h', tint: 'text-brand-600', label: 'təkrarlama pəncərəsi', text: 'Eyni heyvan üçün təkrar elan filtrasiyası.' },
           { value: '0,65', tint: 'text-sun-600', label: 'uyğunluq həddi', text: 'Bu baldan yuxarı hər iki tərəf bildiriş alır.' },
         ].map((item) => (

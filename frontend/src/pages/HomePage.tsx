@@ -1,22 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { Counter, Kicker, LinkButton, Reveal } from '../components/ui'
-import { FEED, HERO_STATS, MARQUEE_ITEMS, PawBadge, renderMarquee } from '../lib/paw'
-
-export function PawGlyph({ className = 'size-5' }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
-      <path
-        d="M12 8.5c-1 2-2.2 3.4-3.6 4.6M12 8.5c1 2 2.2 3.4 3.6 4.6m0-6a1.4 1.4 0 1 0 .01 0m-7.2 0a1.4 1.4 0 1 0 .01 0"
-        strokeLinecap="round"
-      />
-      <path
-        d="M6 18c1 .8 2.4 1.4 3.6 2.2 1 .6 2 .6 2.4.6.4 0 1.4 0 2.4-.6 1.2-.8 2.6-1.4 3.6-2.2"
-        strokeLinecap="round"
-      />
-    </svg>
-  )
-}
+import { FEED, HERO_STATS, MARQUEE_ITEMS, PawBadge, PawGlyph, renderMarquee } from '../lib/paw'
 
 const TRACK = [
   { title: 'Qeyd edin', text: 'Heyvanı xəritədə qeyd edin — şəkil, yer, vəziyyət.', tone: 'done' },
@@ -414,7 +399,7 @@ export default function HomePage() {
                 <PawGlyph className="size-4" /> Başlamaq üçün
               </span>
               <h2 className="display mt-5 text-4xl leading-tight text-white sm:text-6xl">
-                Bugün köməyi{' '}
+                Bugün köməyə{' '}
                 <span className="text-stroke-white">başla</span>
               </h2>
               <p className="mt-4 max-w-md text-base font-semibold leading-relaxed text-white/80">

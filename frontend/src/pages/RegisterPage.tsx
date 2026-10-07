@@ -40,7 +40,7 @@ export default function RegisterPage() {
         fullName: form.fullName.trim() || undefined,
         phoneNumber: form.phoneNumber.trim() || undefined,
       })
-      navigate('/complaints/new', { replace: true })
+      navigate('/', { replace: true })
     } catch (cause) {
       if (cause instanceof ApiError) {
         setError(cause.message)
@@ -57,7 +57,7 @@ export default function RegisterPage() {
     <AuthShell
       kicker="Qeydiyyat"
       title="Pulsuz hesab yaradın"
-      subtitle="Ad və telefon isteğe bağlıdır — istifadəçi adı və parolla başlayın."
+      subtitle="Ad və telefon vacib deyil — istifadəçi adı və parolla başlayın."
       footer={
         <>
           Artıq hesabınız var?{' '}
@@ -93,7 +93,7 @@ export default function RegisterPage() {
             />
           </Field>
 
-          <Field label="Ad, soyad" hint="Ola şərti">
+          <Field label="Ad, soyad" hint="Məcburi deyil">
             <input
               className="field-input"
               value={form.fullName}
@@ -130,7 +130,7 @@ export default function RegisterPage() {
             />
           </Field>
 
-          <Field label="Telefon" hint="İsteğe bağlı, max 20 simvol">
+          <Field label="Telefon" hint="Vacib deyil, max 20 simvol">
             <input
               className="field-input"
               value={form.phoneNumber}

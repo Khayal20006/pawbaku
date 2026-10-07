@@ -34,8 +34,10 @@ export const PRIORITY_STYLES: Record<Priority, string> = {
 
 export const ROLE_LABELS: Record<Role, string> = {
   CITIZEN: 'Vətəndaş',
-  DEPARTMENT_MANAGER: 'Şöbə müdir',
-  FIELD_EMPLOYEE: 'Sahə işçisi',
+  VOLUNTEER: 'Könüllü',
+  SHELTER_STAFF: 'Sığınacaq əməkdaşı',
+  VET: 'Baytar',
+  MODERATOR: 'Moderator',
   ADMIN: 'Administrator',
 }
 

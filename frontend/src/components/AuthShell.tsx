@@ -1,11 +1,12 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Kicker } from './ui'
+import { PawGlyph } from '../lib/paw'
 
 const POINTS = [
-  'Şikayəti xəritədə 10 dəqiqəyə verin',
-  'Məsul idarəyə avtomatik yönləndirmə',
-  'Həll prosesini real vaxtda izləyin',
+  'Elanı xəritədə bir dəqiqəyə verin',
+  'Sistem uyğunluq balı hesablayır, bildiriş göndərir',
+  'Köməyin axınını real vaxtda izləyin',
 ]
 
 /**
@@ -31,17 +32,20 @@ export default function AuthShell({
         <aside className="relative hidden flex-col justify-between overflow-hidden bg-ink p-10 text-white md:flex">
           <div className="dot-grid-light pointer-events-none absolute inset-0 opacity-25" />
           <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-brand-600/40 blur-3xl" />
+          <span className="blob pointer-events-none absolute -left-12 -bottom-16 size-48 bg-sea-600/30" aria-hidden />
 
           <div className="relative">
             <div className="flex items-center gap-2.5">
-              <span className="inline-block size-1.5 rounded-full bg-brand-400" aria-hidden />
-              <span className="display block text-sm text-white">Şəhər Xidmətləri</span>
+              <span className="flex size-9 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-pop">
+                <PawGlyph className="size-5" />
+              </span>
+              <span className="display block text-sm text-white">Paw-Baku</span>
             </div>
 
             <h2 className="display mt-10 text-3xl leading-tight">
-              Şəhərin yaxşılaşmasına
+              Köməyə bir
               <br />
-              bir şikayətdən başlayın.
+              pəncədən başlayın.
             </h2>
 
             <ul className="mt-8 space-y-3">
@@ -63,14 +67,14 @@ export default function AuthShell({
           </div>
 
           <p className="relative mt-10 text-xs leading-relaxed text-white/40">
-            Portal Bakı şəhərinin infrastruktur xidmətlərini vahid rəqəmsal məkanda birləşdirir.
+            PawBaku — Bakıda sahibsiz və itkin heyvanlar üçün vahid rəqəmsal platforma.
           </p>
         </aside>
 
         <div className="flex flex-col justify-center p-7 sm:p-10">
           <div className="md:hidden">
             <span className="display block text-lg text-ink">
-              Şəhər <em className="font-medium text-brand-600">Xidmətləri</em>
+              Paw<em className="font-medium text-brand-600">Baku</em>
             </span>
           </div>
 

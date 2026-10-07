@@ -1,6 +1,5 @@
 import { Kicker, LinkButton, SectionTitle } from '../components/ui'
-import { PawBadge } from '../lib/paw'
-import { PawGlyph } from './HomePage'
+import { PawBadge, PawGlyph } from '../lib/paw'
 
 const STEPS = [
   { title: 'Qeyd edin', text: 'Şəkil + xəritədə yer + vəziyyət (zədə/açlıq).', tint: 'bg-brand-50', ring: 'bg-brand-600', tone: 'live' },
@@ -96,7 +95,7 @@ export default function ReportPage() {
             </ol>
 
             <p className="mt-auto pt-2 text-xs font-medium leading-relaxed text-ink/50">
-              Status keçidi yalnız məcburi ardıcıllıqla — söz hüququ olduğu rolun mötərizəsindədir.
+              Hər status keçidini yalnız buna hüququ olan rol edə bilər — ardıcıllıq məcburidir.
             </p>
           </div>
         </div>
@@ -111,7 +110,7 @@ export default function ReportPage() {
           </span>
           <p className="max-w-xl text-sm font-semibold leading-relaxed text-white/90">
             Heyvanın həyatı üçün risk varsa <strong className="font-extrabold">təcili</strong> qeyd edin —
-            sistem bildirişi əvvəlcədən müəyyən köhnə könüllüyə və yaxınlıqdakı baytara çatdırır.
+            sistem bildirişi əvvəlcədən seçilmiş könüllüyə və yaxınlıqdakı baytara çatdırır.
           </p>
         </div>
         <Kicker className="shrink-0 inline-flex items-center gap-2 !text-white">
