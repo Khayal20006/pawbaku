@@ -15,20 +15,36 @@ ayrı DB (`pawbaku`) — başqa layihədən heç bir dependency yoxdur.
 
 ## İşə salma
 
-**Backend** (PostgreSQL tələb olunur; `application-local.yml` kimi local override oraya
-əlavə olunur, fayl git-ignore-dır):
+**1) Bir əmrlə hamısı (tövsiyə olunan) — Docker:**
 
 ```bash
-./mvnw spring-boot:run
-# və ya: ./mvnw -DskipTests package && java -jar target/pawbaku.jar
+cp .env.example .env        # ilk dəfə; dəyərləri redaktə edə bilərsiz
+docker compose up --build
 ```
 
-**Frontend (dev):**
+- Frontend: http://localhost:8888
+- Backend API: http://localhost:8081 (nginx arxada `backend:8080`)
+- PostgreSQL: `pawbaku-db` (port 5433, məlumatlar `pgdata` volume-da)
+- İlk admin: `.env`-dəki `BOOTSTRAP_ADMIN_PASSWORD`, istifadəçi `admin`
+
+**2) Yerli dev (Docker-siz):**
+
+Backend Postgres tələb edir — əlaqə portunu `DB_PORT` ilə yola salın:
 
 ```bash
-cd frontend
-npm ci
-npm run dev
+./mvnw spring-boot:run        # .env kimi: DB_PORT=5433 JWT_SECRET=... BOOTSTRAP_ADMIN_PASSWORD=...
+cd frontend && npm ci && npm run dev
+```
+
+## Layihə strukturu
+
+```
+pawbaku/
+├─ frontend/     # Vite + React 19 + TS + Tailwind v4 (Home, Listings, Report, Adopt, Auth, 404)
+├─ src/main/java/com/example/pawbaku/   # Spring Boot 4 + Java 21 (auth, RBAC, bootstrap admin)
+├─ src/main/resources/db/migration/     # Flyway V1 (users, animals, listings)
+├─ docker-compose.yml, Dockerfile, frontend/Dockerfile + nginx.conf
+└─ ARCHITECTURE.md, PAWBAKU_SPEC.md, README.md
 ```
 
 ## Növbəti addımlar

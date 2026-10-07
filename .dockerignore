@@ -1,0 +1,10 @@
+target/
+uploads/
+frontend/
+.git/
+.idea/
+.qodo/
+*.log
+application-local.yml
+.env
+.env.*
