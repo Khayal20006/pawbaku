@@ -51,7 +51,7 @@ export default function HomePage() {
       {/* ------------------------------------------------------------------ hero */}
       <section className="relative -mx-4 overflow-hidden border-b border-ink/10 sm:-mx-6">
         <img
-          src="/hero-paw.jpg"
+          src="/hero-baku.jpg"
           alt=""
           aria-hidden
           loading="eager"
