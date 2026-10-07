@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { Counter, Kicker, LinkButton, Reveal } from '../components/ui'
 import { FEED, HERO_STATS, MARQUEE_ITEMS, PawBadge, PawGlyph, renderMarquee } from '../lib/paw'
+import { getStoredReports, mergeFeed } from '../lib/store'
 
 const TRACK = [
   { title: 'Qeyd edin', text: 'Heyvanı xəritədə qeyd edin — şəkil, yer, vəziyyət.', tone: 'done' },
@@ -66,6 +67,7 @@ const MODULES: {
 
 export default function HomePage() {
   const { user } = useAuth()
+  const feed = mergeFeed(FEED, getStoredReports())
 
   return (
     <div className="space-y-24">
@@ -296,7 +298,7 @@ export default function HomePage() {
         </div>
 
         <div className="mt-10 grid gap-5 lg:grid-cols-3">
-          {FEED.map((item, index) => {
+          {feed.map((item, index) => {
             const tints = ['bg-brand-100', 'bg-sea-100', 'bg-sun-100']
             const avatars = ['bg-brand-600', 'bg-sea-600', 'bg-sun-500']
             return (
