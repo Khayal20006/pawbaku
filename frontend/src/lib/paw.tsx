@@ -155,14 +155,14 @@ export const FEED: FeedItem[] = [
 ]
 
 const STATUS_STYLES: Record<string, string> = {
-  REPORTED: 'bg-rose-50 text-rose-800 ring-rose-200',
-  VERIFIED: 'bg-sky-50 text-sky-800 ring-sky-200',
-  VOLUNTEER_ASSIGNED: 'bg-amber-50 text-amber-800 ring-amber-200',
-  VET_CARE: 'bg-violet-50 text-violet-800 ring-violet-200',
-  RESOLVED: 'bg-emerald-50 text-emerald-800 ring-emerald-200',
-  ACTIVE: 'bg-emerald-50 text-emerald-800 ring-emerald-200',
-  MATCHED: 'bg-sky-50 text-sky-800 ring-sky-200',
-  CLOSED: 'bg-ink/5 text-ink/55 ring-ink/10',
+  REPORTED: 'bg-brand-500 text-white',
+  VERIFIED: 'bg-sea-600 text-white',
+  VOLUNTEER_ASSIGNED: 'bg-sun-500 text-ink',
+  VET_CARE: 'bg-violet-600 text-white',
+  RESOLVED: 'bg-ink text-parchment',
+  ACTIVE: 'bg-sea-600 text-white',
+  MATCHED: 'bg-violet-600 text-white',
+  CLOSED: 'bg-ink/10 text-ink/50',
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -179,7 +179,7 @@ const STATUS_LABELS: Record<string, string> = {
 export function PawBadge({ status }: { status: ReportStatus | ListingStatus }) {
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${STATUS_STYLES[status]}`}
+      className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide shadow-sm ${STATUS_STYLES[status]}`}
     >
       {STATUS_LABELS[status]}
     </span>
@@ -190,8 +190,8 @@ export function KindTag({ kind }: { kind: ListingKind }) {
   const lost = kind === 'LOST'
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-white shadow-card ${
-        lost ? 'bg-rose-700' : 'bg-emerald-700'
+      className={`pop-stick inline-flex items-center gap-1 rounded-full border-2 border-ink px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white ${
+        lost ? 'bg-rose-600' : 'bg-sea-500'
       }`}
     >
       {lost ? 'İtkin' : 'Tapıldı'}

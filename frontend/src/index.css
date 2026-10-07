@@ -2,32 +2,59 @@
 @import 'leaflet/dist/leaflet.css';
 
 @theme {
-  --font-sans: 'Karla', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Nunito', ui-rounded, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Baloo 2', 'Nunito', ui-rounded, system-ui, sans-serif;
 
-  --color-paper: #f4f2ec;
-  --color-parchment: #fbfaf6;
-  --color-ink: #221d16;
-  --color-ink-soft: #4a4238;
+  --color-paper: #fff8ee;
+  --color-parchment: #ffffff;
+  --color-ink: #2b211c;
+  --color-ink-soft: #564a40;
 
-  --color-brand-50: #faf1ea;
-  --color-brand-100: #f4dfcf;
-  --color-brand-200: #e8bda0;
-  --color-brand-300: #d99c76;
-  --color-brand-400: #cb7a4e;
-  --color-brand-500: #bc5f32;
-  --color-brand-600: #9f4a23;
-  --color-brand-700: #833a1b;
-  --color-brand-800: #652d16;
-  --color-brand-900: #4a2112;
+  --color-brand-50: #fff4ec;
+  --color-brand-100: #ffe5d3;
+  --color-brand-200: #ffc9a8;
+  --color-brand-300: #ffa978;
+  --color-brand-400: #ff8748;
+  --color-brand-500: #ff6b23;
+  --color-brand-600: #f25600;
+  --color-brand-700: #cc4700;
+  --color-brand-800: #a63a02;
+  --color-brand-900: #843004;
 
-  --shadow-card: 0 1px 2px rgb(34 29 22 / 0.05), 0 16px 40px -24px rgb(34 29 22 / 0.18);
-  --shadow-lift: 0 2px 4px rgb(34 29 22 / 0.04), 0 28px 56px -28px rgb(34 29 22 / 0.3);
+  --color-sea-50: #ecfdf9;
+  --color-sea-100: #d0f9ef;
+  --color-sea-200: #a1f0de;
+  --color-sea-300: #67e0c6;
+  --color-sea-400: #32c7a9;
+  --color-sea-500: #18a98c;
+  --color-sea-600: #0e8a72;
+  --color-sea-700: #0d6e5e;
+  --color-sea-800: #0d574c;
+  --color-sea-900: #0b453e;
+
+  --color-sun-50: #fff9ec;
+  --color-sun-100: #ffefc7;
+  --color-sun-200: #ffdd8a;
+  --color-sun-300: #ffc74d;
+  --color-sun-400: #ffb112;
+  --color-sun-500: #f59e00;
+  --color-sun-600: #db8300;
+  --color-sun-700: #b66600;
+
+  --shadow-card: 0 1px 2px rgb(43 33 28 / 0.04), 0 18px 40px -24px rgb(43 33 28 / 0.22);
+  --shadow-lift: 0 2px 6px rgb(43 33 28 / 0.05), 0 32px 64px -28px rgb(43 33 28 / 0.32);
+  --shadow-pop: 4px 4px 0 0 rgb(43 33 28 / 1);
+  --shadow-pop-lg: 8px 8px 0 0 rgb(43 33 28 / 1);
+  --shadow-white-pop: 4px 4px 0 0 rgb(255 255 255 / 0.9);
 
   --animate-fade-up: fade-up 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-fade-in: fade-in 0.4s ease both;
   --animate-shimmer: shimmer 1.7s linear infinite;
-  --animate-marquee: marquee 30s linear infinite;
+  --animate-marquee: marquee 32s linear infinite;
+  --animate-float-soft: float-soft 6s ease-in-out infinite;
+  --animate-blob: blob 12s ease-in-out infinite;
+  --animate-wiggle: wiggle 2.6s ease-in-out infinite;
+  --animate-spin-slow: spin 14s linear infinite;
 
   @keyframes marquee {
     from {
@@ -66,18 +93,89 @@
       background-position: 400px 0;
     }
   }
+
+  @keyframes float-soft {
+    0%,
+    100% {
+      transform: translateY(0) rotate(-4deg);
+    }
+    50% {
+      transform: translateY(-9px) rotate(-4deg);
+    }
+  }
+
+  @keyframes blob {
+    0%,
+    100% {
+      border-radius: 46% 54% 60% 40% / 45% 40% 60% 55%;
+      transform: rotate(0deg) scale(1);
+    }
+    50% {
+      border-radius: 55% 45% 44% 56% / 55% 52% 48% 45%;
+      transform: rotate(6deg) scale(1.05);
+    }
+  }
+
+  @keyframes wiggle {
+    0%,
+    100% {
+      transform: rotate(-5deg);
+    }
+    50% {
+      transform: rotate(5deg);
+    }
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
 }
 
-/* Fine dot-grid used on dark panels; reads as a quiet blueprint texture. */
-@utility dot-grid-light {
-  background-image: radial-gradient(rgb(255 255 255 / 0.14) 1px, transparent 1px);
-  background-size: 22px 22px;
-}
+/* ------------------------------------------------------------- textures */
 
-/* Dot-grid for light panels — faint ink dots, blueprint feel. */
 @utility dot-grid {
-  background-image: radial-gradient(rgb(34 29 22 / 0.13) 1px, transparent 1px);
-  background-size: 22px 22px;
+  background-image: radial-gradient(rgb(43 33 28 / 0.14) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+@utility dot-grid-light {
+  background-image: radial-gradient(rgb(255 255 255 / 0.16) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Outlined display text — the "blank sticker" trick used on big headlines. */
+.text-stroke {
+  -webkit-text-stroke: 2.5px var(--color-ink);
+  color: transparent;
+}
+.text-stroke-brand {
+  -webkit-text-stroke: 2.5px var(--color-brand-500);
+  color: transparent;
+}
+.text-stroke-white {
+  -webkit-text-stroke: 2.5px rgb(255 255 255 / 0.8);
+  color: transparent;
+}
+
+/* Hard-offset sticker shadow that lifts on hover/press. */
+.pop-stick {
+  box-shadow: var(--shadow-pop);
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease;
+}
+.pop-stick:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-pop-lg);
+}
+.pop-stick:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 0 rgb(43 33 28 / 1);
+}
+
+/* Organic blob for decorative gradient circles. */
+.blob {
+  animation: blob 12s ease-in-out infinite;
 }
 
 @layer base {
@@ -100,13 +198,13 @@
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: rgb(34 29 22 / 0.25) transparent;
+    scrollbar-color: rgb(43 33 28 / 0.25) transparent;
   }
 }
 
 @layer components {
   .card {
-    @apply rounded-xl border border-ink/10 bg-parchment shadow-card;
+    @apply rounded-3xl border border-ink/10 bg-parchment shadow-card;
   }
 
   .hairline {
@@ -114,15 +212,15 @@
   }
 
   .kicker {
-    @apply font-sans text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-600;
+    @apply font-sans text-[11px] font-extrabold uppercase tracking-[0.2em] text-brand-600;
   }
 
   .field-label {
-    @apply mb-1.5 block text-sm font-medium text-ink;
+    @apply mb-1.5 block text-sm font-bold text-ink;
   }
 
   .field-input {
-    @apply w-full rounded-lg border border-ink/15 bg-white px-3.5 py-2.5 text-sm text-ink transition
+    @apply w-full rounded-xl border border-ink/15 bg-white px-3.5 py-2.5 text-sm font-medium text-ink transition
       placeholder:text-ink/35 focus:border-brand-500 focus:ring-brand-500 focus:ring-2 focus:outline-none;
   }
 
@@ -131,20 +229,20 @@
   }
 
   .display {
-    @apply font-display font-semibold tracking-tight;
+    @apply font-display font-bold tracking-tight;
   }
 }
 
 .shimmer-bar {
   background: linear-gradient(
     100deg,
-    rgb(34 29 22 / 0.05) 40%,
-    rgb(34 29 22 / 0.12) 50%,
-    rgb(34 29 22 / 0.05) 60%
+    rgb(43 33 28 / 0.05) 40%,
+    rgb(43 33 28 / 0.12) 50%,
+    rgb(43 33 28 / 0.05) 60%
   );
   background-size: 400px 100%;
   animation: shimmer 1.7s linear infinite;
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
 }
 
 /* Leaflet needs an explicit height and its own font stack to stay inside the theme. */
@@ -153,7 +251,7 @@
   z-index: 0;
 }
 
-/* Pulsing blue dot for the user's current position on leaflet maps. */
+/* Pulsing dot for the user's current position on leaflet maps. */
 .cur-dot {
   display: block;
   position: relative;
@@ -164,16 +262,16 @@
   position: absolute;
   inset: 0;
   border-radius: 9999px;
-  background: rgb(2 132 199 / 0.32);
+  background: rgb(242 86 0 / 0.32);
   animation: pulse-ring 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 .cur-dot-core {
   position: absolute;
   inset: 8px;
   border-radius: 9999px;
-  background: #0284c7;
+  background: #f25600;
   border: 2.5px solid #fff;
-  box-shadow: 0 1px 4px rgb(2 132 199 / 0.5);
+  box-shadow: 0 1px 4px rgb(242 86 0 / 0.5);
 }
 @keyframes pulse-ring {
   0% {
@@ -184,17 +282,6 @@
     transform: scale(1.7);
     opacity: 0;
   }
-}
-
-/* Fine paper grain over everything — the print feel that keeps the UI from looking flat. */
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 40;
-  pointer-events: none;
-  opacity: 0.055;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
 }
 
 /* Scroll-reveal: elements fade up when they enter the viewport. */
@@ -217,7 +304,7 @@ body::after {
   }
 }
 
-/* Editorial marquee ticker. */
+/* Marquee ticker with soft edge fade. */
 .marquee {
   display: flex;
   overflow: hidden;
@@ -231,24 +318,6 @@ body::after {
   animation: marquee 36s linear infinite;
   will-change: transform;
 }
-@keyframes marquee {
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-@keyframes float-soft {
-  0%,
-  100% {
-    transform: translateY(0) rotate(-4deg);
-  }
-  50% {
-    transform: translateY(-9px) rotate(-4deg);
-  }
-}
-.float-soft {
-  animation: float-soft 6s ease-in-out infinite;
-}
 
 /* Grow-from-left underline used on nav links and text links. */
 .link-underline {
@@ -260,7 +329,8 @@ body::after {
   left: 0;
   right: 100%;
   bottom: -3px;
-  height: 1.5px;
+  height: 2px;
+  border-radius: 9999px;
   background: currentColor;
   transition: right 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -269,7 +339,7 @@ body::after {
   right: 0;
 }
 
-/* Category-card hairline that grows on hover. */
+/* Card hairline that grows (coral) on hover. */
 .card-rule {
   position: relative;
 }
@@ -279,7 +349,8 @@ body::after {
   left: 0;
   right: 100%;
   top: 0;
-  height: 1px;
+  height: 2px;
+  border-radius: 9999px;
   background: linear-gradient(to right, var(--color-brand-500), var(--color-brand-300));
   transition: right 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }

@@ -21,10 +21,10 @@ type ButtonSize = 'sm' | 'md' | 'lg'
 
 const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
   primary:
-    'bg-ink text-parchment hover:bg-brand-700 focus-visible:outline-brand-600 shadow-[0_10px_24px_-12px_rgb(34_29_22/0.5)]',
-  secondary: 'bg-parchment text-ink ring-1 ring-ink/15 hover:ring-ink/30',
+    'bg-brand-600 text-white hover:bg-brand-700 focus-visible:outline-brand-600 shadow-[0_12px_26px_-14px_rgb(242_86_0/0.55)]',
+  secondary: 'bg-white text-ink ring-1 ring-ink/15 hover:ring-ink/35 hover:bg-ink/5',
   ghost: 'text-ink/65 hover:bg-ink/5 hover:text-ink',
-  danger: 'bg-rose-700 text-white hover:bg-rose-800 focus-visible:outline-rose-700',
+  danger: 'bg-rose-600 text-white hover:bg-rose-700 focus-visible:outline-rose-600',
 }
 
 const BUTTON_SIZES: Record<ButtonSize, string> = {
@@ -284,7 +284,7 @@ export function SectionTitle({
     <div className="relative mb-9 overflow-hidden border-b border-ink/10 pb-7">
       <span
         aria-hidden
-        className="pointer-events-none absolute -left-3 -top-12 hidden select-none font-display text-[9rem] font-semibold leading-none text-ink/[0.05] lg:block"
+        className="pointer-events-none absolute -left-3 -top-12 hidden select-none font-display text-[9rem] font-bold leading-none text-brand-100 lg:block"
       >
         {title.charAt(0)}
       </span>
@@ -341,10 +341,10 @@ export function FilterPill({
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition ring-1 ring-inset ${
+      className={`rounded-full px-3.5 py-1.5 text-xs font-extrabold transition border-2 ${
         active
-          ? 'bg-ink text-parchment ring-ink'
-          : 'bg-transparent text-ink/55 ring-ink/12 hover:bg-ink/5 hover:text-ink'
+          ? 'bg-sun-400 text-ink border-ink shadow-pop -translate-y-0.5'
+          : 'bg-white text-ink/60 border-ink/10 hover:border-ink/30 hover:text-ink'
       }`}
     >
       {children}

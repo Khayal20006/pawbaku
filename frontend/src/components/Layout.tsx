@@ -12,9 +12,18 @@ const NAV_ITEMS = [
 
 function Logo() {
   return (
-    <Link to="/" className="inline-flex items-center gap-3">
-      <span className="display block text-lg leading-none text-ink">
-        Paw<em className="font-medium text-brand-600">Baku</em>
+    <Link to="/" className="inline-flex items-center gap-2.5">
+      <span className="flex size-9 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-pop">
+        <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2">
+          <path
+            d="M12 8.5c-1 2-2.2 3.4-3.6 4.6M12 8.5c1 2 2.2 3.4 3.6 4.6m0-6a1.4 1.4 0 1 0 .01 0m-7.2 0a1.4 1.4 0 1 0 .01 0"
+            strokeLinecap="round"
+          />
+          <path d="M6 18c1 .8 2.4 1.4 3.6 2.2 1 .6 2 .6 2.4.6.4 0 1.4 0 2.4-.6 1.2-.8 2.6-1.4 3.6-2.2" strokeLinecap="round" />
+        </svg>
+      </span>
+      <span className="display block text-xl leading-none text-ink">
+        Paw<em className="font-extrabold text-brand-600">Baku</em>
       </span>
     </Link>
   )
@@ -55,14 +64,14 @@ export default function Layout() {
             : ''
         }`}
       >
-        <div className="border-b border-ink/8">
-          <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-1.5 sm:px-6">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-ink/40">
+        <div className="border-b border-ink/8 bg-brand-600">
+          <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-2 sm:px-6">
+            <span className="text-[10px] font-extrabold uppercase tracking-[0.22em] text-white">
               Bakı · Heyvan Platforması
             </span>
             <a
-              href="mailto:komak@paqbaku.az"
-              className="text-[10px] font-semibold uppercase tracking-[0.22em] text-brand-700 transition hover:text-brand-800"
+              href="mailto:komak@pawbaku.az"
+              className="rounded-full bg-white/15 px-3 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.22em] text-white transition hover:bg-white/25"
             >
 komak@pawbaku.az
             </a>
@@ -88,7 +97,7 @@ komak@pawbaku.az
                   onClick={() => setUserMenuOpen((open) => !open)}
                   className="flex items-center gap-2.5 rounded-full py-1 pl-1 pr-3 ring-1 ring-ink/10 transition hover:ring-ink/25"
                 >
-                  <span className="flex size-7 items-center justify-center rounded-full bg-ink text-[11px] font-semibold text-parchment">
+                  <span className="flex size-7 items-center justify-center rounded-full bg-brand-600 text-[11px] font-extrabold text-white">
                     {initials(user.fullName, user.username)}
                   </span>
                   <span className="hidden text-left md:block">
@@ -136,7 +145,7 @@ komak@pawbaku.az
                 </Link>
                 <Link
                   to="/register"
-                  className="rounded-full bg-ink px-5 py-2 text-sm font-semibold text-parchment shadow-[0_10px_24px_-14px_rgb(34_29_22/0.6)] transition hover:bg-brand-700"
+                  className="rounded-full bg-brand-600 px-5 py-2 text-sm font-extrabold text-white shadow-[0_10px_24px_-14px_rgb(242_86_0/0.6)] transition hover:bg-brand-700"
                 >
                   Qeydiyyat
                 </Link>
@@ -183,7 +192,7 @@ komak@pawbaku.az
                 </Link>
                 <Link
                   to="/register"
-                  className="flex-1 rounded-full bg-ink px-4 py-2 text-center text-sm font-semibold text-parchment"
+                  className="flex-1 rounded-full bg-brand-600 px-4 py-2 text-center text-sm font-extrabold text-white"
                 >
                   Qeydiyyat
                 </Link>

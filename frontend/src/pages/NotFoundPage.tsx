@@ -13,10 +13,12 @@ export default function NotFoundPage() {
         Axtardığınız səhifə köçürülüb və ya silinib — baş keçidi ilə davam edin.
       </p>
       <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-        <LinkButton to="/">Ana səhifə</LinkButton>
+        <LinkButton to="/" className="pop-stick">
+          Ana səhifə
+        </LinkButton>
         <Link
           to="/listings"
-          className="inline-flex items-center rounded-full px-5 py-2.5 text-sm font-semibold text-ink/55 ring-1 ring-ink/15 transition hover:bg-ink/5 hover:text-ink"
+          className="inline-flex items-center rounded-full border-2 border-ink bg-white px-5 py-2 text-sm font-extrabold text-ink/60 transition hover:bg-sun-100 hover:text-ink"
         >
           Elanlara bax
         </Link>
