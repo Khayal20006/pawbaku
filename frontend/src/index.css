@@ -1,0 +1,278 @@
+@import 'tailwindcss';
+@import 'leaflet/dist/leaflet.css';
+
+@theme {
+  --font-sans: 'Karla', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+
+  --color-paper: #f4f2ec;
+  --color-parchment: #fbfaf6;
+  --color-ink: #221d16;
+  --color-ink-soft: #4a4238;
+
+  --color-brand-50: #faf1ea;
+  --color-brand-100: #f4dfcf;
+  --color-brand-200: #e8bda0;
+  --color-brand-300: #d99c76;
+  --color-brand-400: #cb7a4e;
+  --color-brand-500: #bc5f32;
+  --color-brand-600: #9f4a23;
+  --color-brand-700: #833a1b;
+  --color-brand-800: #652d16;
+  --color-brand-900: #4a2112;
+
+  --shadow-card: 0 1px 2px rgb(34 29 22 / 0.05), 0 16px 40px -24px rgb(34 29 22 / 0.18);
+  --shadow-lift: 0 2px 4px rgb(34 29 22 / 0.04), 0 28px 56px -28px rgb(34 29 22 / 0.3);
+
+  --animate-fade-up: fade-up 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-fade-in: fade-in 0.4s ease both;
+  --animate-shimmer: shimmer 1.7s linear infinite;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes shimmer {
+    from {
+      background-position: -400px 0;
+    }
+    to {
+      background-position: 400px 0;
+    }
+  }
+}
+
+/* Fine dot-grid used on dark panels; reads as a quiet blueprint texture. */
+@utility dot-grid-light {
+  background-image: radial-gradient(rgb(255 255 255 / 0.14) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-size: 17px;
+  }
+
+  body {
+    @apply bg-paper font-sans text-ink antialiased;
+  }
+
+  ::selection {
+    @apply bg-brand-200 text-brand-900;
+  }
+
+  :focus-visible {
+    @apply outline-brand-500 outline-2 outline-offset-2;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(34 29 22 / 0.25) transparent;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-xl border border-ink/10 bg-parchment shadow-card;
+  }
+
+  .hairline {
+    @apply border-t border-ink/10;
+  }
+
+  .kicker {
+    @apply font-sans text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-600;
+  }
+
+  .field-label {
+    @apply mb-1.5 block text-sm font-medium text-ink;
+  }
+
+  .field-input {
+    @apply w-full rounded-lg border border-ink/15 bg-white px-3.5 py-2.5 text-sm text-ink transition
+      placeholder:text-ink/35 focus:border-brand-500 focus:ring-brand-500 focus:ring-2 focus:outline-none;
+  }
+
+  .field-hint {
+    @apply mt-1.5 text-xs text-ink/55;
+  }
+
+  .display {
+    @apply font-display font-semibold tracking-tight;
+  }
+}
+
+.shimmer-bar {
+  background: linear-gradient(
+    100deg,
+    rgb(34 29 22 / 0.05) 40%,
+    rgb(34 29 22 / 0.12) 50%,
+    rgb(34 29 22 / 0.05) 60%
+  );
+  background-size: 400px 100%;
+  animation: shimmer 1.7s linear infinite;
+  border-radius: 0.5rem;
+}
+
+/* Leaflet needs an explicit height and its own font stack to stay inside the theme. */
+.leaflet-container {
+  @apply h-full w-full rounded-xl bg-parchment font-sans;
+  z-index: 0;
+}
+
+/* Pulsing blue dot for the user's current position on leaflet maps. */
+.cur-dot {
+  display: block;
+  position: relative;
+  width: 28px;
+  height: 28px;
+}
+.cur-dot-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: rgb(2 132 199 / 0.32);
+  animation: pulse-ring 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+.cur-dot-core {
+  position: absolute;
+  inset: 8px;
+  border-radius: 9999px;
+  background: #0284c7;
+  border: 2.5px solid #fff;
+  box-shadow: 0 1px 4px rgb(2 132 199 / 0.5);
+}
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.55);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+
+/* Fine paper grain over everything — the print feel that keeps the UI from looking flat. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  opacity: 0.055;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+}
+
+/* Scroll-reveal: elements fade up when they enter the viewport. */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Editorial marquee ticker. */
+.marquee {
+  display: flex;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+.marquee-track {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  animation: marquee 36s linear infinite;
+  will-change: transform;
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-4deg);
+  }
+  50% {
+    transform: translateY(-9px) rotate(-4deg);
+  }
+}
+.float-soft {
+  animation: float-soft 6s ease-in-out infinite;
+}
+
+/* Grow-from-left underline used on nav links and text links. */
+.link-underline {
+  position: relative;
+}
+.link-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 100%;
+  bottom: -3px;
+  height: 1.5px;
+  background: currentColor;
+  transition: right 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.link-underline:hover::after,
+.link-underline.is-active::after {
+  right: 0;
+}
+
+/* Category-card hairline that grows on hover. */
+.card-rule {
+  position: relative;
+}
+.card-rule::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 100%;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(to right, var(--color-brand-500), var(--color-brand-300));
+  transition: right 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card-rule:hover::before {
+  right: 0;
+}
+
+@media print {
+  .no-print {
+    display: none;
+  }
+}

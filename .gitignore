@@ -1,0 +1,23 @@
+# dependencies
+node_modules/
+
+# build
+dist/
+target/
+build/
+*.class
+
+# env & secrets
+.env
+.env.*
+!.env.example
+application-local.yml
+
+# uploads
+uploads/
+
+# IDE / extras
+.idea/
+.vscode/
+.qodo/
+*.log
