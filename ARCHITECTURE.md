@@ -80,20 +80,20 @@ Radius axtarışı MVP-də Haversine (Java tərəfdə); PostGIS milestone 2.
 
 ```
 pawbaku/
-├─ frontend/                 # ✅ HAZIRDUR — Vite + React 19 + TS + Tailwind v4
+├─ frontend/                 # ✅ HAZIRDIR — Vite + React 19 + TS + Tailwind v4
 │  ├─ src/pages/             # Home, Listings, Report, Adopt, Login/Register/Profile, 404
 │  ├─ src/components/        # ui.tsx (design kit), Layout, AuthShell, ProtectedRoute
 │  ├─ src/context/ hooks/ lib/
-│  └─ public/                # hero-paw.jpg, hero-paw-2.jpg
-├─ src/main/java/…            # ⏳ Spring Boot 4 + Java 21
-│  ├─ model/                 # Animal, Listing, StreetReport, AdoptionListing, Application,
-│  │                         #   Pledge, Need, Notification(outbox), AuditLog (+ enums, transitions)
+│  └─ public/                # hero-baku.jpg, hero-paw.jpg, hero-paw-2.jpg
+├─ src/main/java/com/example/pawbaku/   # ✅ Pillə 1 hazırdır — Spring Boot 4 + Java 21
+│  ├─ model/                 # User (6 rol) — animals/listings Pillə 2
 │  ├─ controller/ service/ repository/ dto/ mapper/
-│  ├─ security/              # JWT (şikayət-portal kodundan köçürülür)
-│  ├─ matcher/               # MatchingScorer + MATCH_CONFIG + Haversine
-│  └─ notif/                 # OutboxJob, TelegramSender, EmailSender
-├─ db/migration/             # Flyway V1__
-├─ Dockerfile, docker-compose.yml, .env.example
+│  ├─ security/              # JWT HS256 (öz-özünə təsdiq), RBAC
+│  └─ config/                # SecurityConfig, DataInitializer (bootstrap admin)
+├─ src/main/resources/
+│  ├─ application.yml        # env-dən: DB_*, JWT_SECRET, BOOTSTRAP_ADMIN_PASSWORD
+│  └─ db/migration/V1__init_schema.sql   # users, animals, listings
+├─ Dockerfile, application-local.yml (git-ignored), .env.example
 └─ ARCHITECTURE.md, PAWBAKU_SPEC.md, README.md
 ```
 
@@ -109,7 +109,8 @@ pawbaku/
 
 ## 6. Sifariş (növbəti addımlar)
 
-1. Backend scaffold: pom, app, users + JWT, ilkin Flyway (users, animals, listings).
-2. Pillə 1 CRUD: listings/reports üçün rest + test.
-3. Pillə 2: matcher + deduplikasiya + outbox bildiriş.
-4. Pillə 3: Telegram bot + street report axını + deploy.
+1. ✅ Backend Pillə 1: pom, users (6 rol) + JWT auth, Flyway V1 (users, animals, listings).
+2. Pillə 1 çalışan yoxlama: PostgreSQL ilə run + `POST /api/auth/*` smoke test.
+3. Pillə 2: Animal/Listing model + CRUD, status keçid `allowedTransitions()`, deduplikasiya.
+4. Pillə 3: StreetReport axını + matcher (`MatchingScorer`) + outbox bildiriş + Telegram.
+5. Pillə 4: docker-compose (db + backend + nginx) + deploy.

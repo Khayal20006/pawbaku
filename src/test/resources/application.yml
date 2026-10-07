@@ -1,0 +1,37 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${TEST_DB_NAME:pawbaku_test}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:mysecretpassword}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: false
+
+  flyway:
+    enabled: true
+    clean-disabled: false
+    locations: classpath:db/migration
+
+logging:
+  level:
+    root: WARN
+    com.example.pawbaku: INFO
+    org.flywaydb: WARN
+
+pawbaku:
+  security:
+    jwt:
+      secret: test-secret-key-that-is-definitely-long-enough-for-hs256!!
+      issuer: https://api.pawbaku.az
+      expiration-minutes: 30
+  cors:
+    allowed-origins: http://localhost:5173
+  bootstrap:
+    admin:
+      username: admin
+      password: Admin123!
+      email: admin@pawbaku.az
