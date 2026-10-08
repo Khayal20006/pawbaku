@@ -52,6 +52,12 @@ export const api = axios.create({
 })
 
 api.interceptors.request.use((config) => {
+  // Public auth endpoints (login, register, OTP) never need a token. Attaching a stale
+  // one would make Spring try to validate it and answer 401 even though the route is
+  // permitAll — which then bounces users off the register page to /login.
+  if (config.url?.startsWith('/api/auth/')) {
+    return config
+  }
   const token = getToken()
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
@@ -67,8 +73,11 @@ api.interceptors.response.use(
 
     if (status === 401) {
       // The token expired or was revoked: drop it and bounce to the login screen.
+      // Public auth endpoints are exempt — an OTP/login hiccup must never boot the
+      // user off the register page, they just retry on the form.
+      const publicAuth = error.config?.url?.startsWith('/api/auth/') ?? false
       setToken(null)
-      if (!window.location.pathname.startsWith('/login')) {
+      if (!publicAuth && !window.location.pathname.startsWith('/login')) {
         window.location.assign('/login')
       }
       return Promise.reject(new ApiError('Sessiya sona çatdı. Yenidən daxil olun.', status))
