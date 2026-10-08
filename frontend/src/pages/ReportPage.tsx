@@ -4,7 +4,16 @@ import { Kicker, LinkButton, SectionTitle } from '../components/ui'
 import ReportTracker from '../components/ReportTracker'
 import { PawBadge, PawGlyph } from '../lib/paw'
 import { BAKU_DISTRICTS } from '../lib/format'
-import { addReport, type NewReportInput, type StoredReport } from '../lib/store'
+import { ApiError, createReport } from '../lib/api'
+import {
+  advanceTrackerReport,
+  resetTrackerReport,
+  speciesToMarketCode,
+  toTrackerReport,
+  type TrackerReport,
+} from '../lib/reports'
+import { addReport, type NewReportInput } from '../lib/store'
+import { useAuth } from '../context/AuthContext'
 
 const TIMELINE: { label: string; status: 'REPORTED' | 'VERIFIED' | 'VOLUNTEER_ASSIGNED' | 'VET_CARE' | 'RESOLVED' }[] = [
   { label: 'Şəkil + yer qeyd olundu', status: 'REPORTED' },
@@ -34,29 +43,70 @@ function chipClass(active: boolean, tint: string) {
 }
 
 export default function ReportPage() {
+  const { user } = useAuth()
   const [species, setSpecies] = useState<(typeof SPECIES)[number]['value']>('İt')
   const [mood, setMood] = useState<(typeof MOODS)[number]['value']>('Zədəli')
   const [district, setDistrict] = useState(BAKU_DISTRICTS[0])
   const [description, setDescription] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const [done, setDone] = useState<StoredReport | null>(null)
+  const [done, setDone] = useState<TrackerReport | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [advancing, setAdvancing] = useState(false)
+  const [advanceError, setAdvanceError] = useState<string | null>(null)
 
-  function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: FormEvent) {
     event.preventDefault()
     const text = description.trim()
     if (text.length < 5) {
       setError('Heyvanla bağlı az xəbər, yeri dəqiq göstərin.')
       return
     }
+    if (!user) {
+      setError('Bildiriş vermək üçün əvvəlcə hesabınıza daxil olun.')
+      return
+    }
     setError(null)
+    setSubmitting(true)
     const input: NewReportInput = {
       title: mood === 'Digər' ? species : `${mood} ${species.toLowerCase()}`,
       description: text,
       district,
     }
-    const created = addReport(input)
-    setDone(created[0])
-    setDescription('')
+    try {
+      const created = await createReport({
+        ...input,
+        species: speciesToMarketCode(species),
+      })
+      setDone(toTrackerReport(created))
+    } catch {
+      // Backend unreachable — keep the flow working offline in this browser.
+      const created = addReport(input)
+      setDone(toTrackerReport(created[0]))
+    } finally {
+      setSubmitting(false)
+      setDescription('')
+    }
+  }
+
+  async function handleAdvance() {
+    if (!done) return
+    setAdvancing(true)
+    setAdvanceError(null)
+    try {
+      setDone(await advanceTrackerReport(done))
+    } catch (cause) {
+      setAdvanceError(cause instanceof ApiError ? cause.message : 'Addım tamamlanmadı, yenidən yoxlayın.')
+    } finally {
+      setAdvancing(false)
+    }
+  }
+
+  function handleReset() {
+    if (!done) return
+    setDone((current) => {
+      if (!current) return current
+      return resetTrackerReport(current) ?? current
+    })
   }
 
   if (done) {
@@ -71,7 +121,13 @@ export default function ReportPage() {
         <div className="mx-auto max-w-xl overflow-hidden rounded-[2rem] border-2 border-ink bg-white shadow-lift">
           <span className="block h-2 bg-gradient-to-r from-brand-500 via-sun-400 to-sea-500" aria-hidden />
           <div className="flex flex-col p-7 sm:p-9">
-            <ReportTracker reportId={done.id} />
+            <ReportTracker
+              report={done}
+              busy={advancing}
+              advanceError={advanceError}
+              onAdvance={handleAdvance}
+              onReset={handleReset}
+            />
 
             <div className="mt-6 flex flex-wrap gap-3">
               <LinkButton to="/listings" className="pop-stick">
@@ -173,10 +229,11 @@ export default function ReportPage() {
 
             <button
               type="submit"
-              className="pop-stick inline-flex w-full items-center justify-center gap-2 rounded-full border-2 border-ink bg-brand-600 px-7 py-3.5 text-[15px] font-extrabold text-white"
+              disabled={submitting}
+              className="pop-stick inline-flex w-full items-center justify-center gap-2 rounded-full border-2 border-ink bg-brand-600 px-7 py-3.5 text-[15px] font-extrabold text-white disabled:cursor-not-allowed disabled:opacity-60"
             >
-              <PawGlyph className="size-5" /> Bildirişi göndər
-              <span aria-hidden>→</span>
+              <PawGlyph className="size-5" /> {submitting ? 'Göndərilir…' : 'Bildirişi göndər'}
+              {!submitting && <span aria-hidden>→</span>}
             </button>
           </div>
         </div>
@@ -240,10 +297,10 @@ export default function ReportPage() {
           </div>
 
           <div className="rounded-[2rem] border-2 border-dashed border-ink/25 bg-white px-6 py-5">
-            <Kicker>Növbəti pillə</Kicker>
+            <Kicker>Yaxın pillə</Kicker>
             <p className="mt-2 text-sm font-medium leading-relaxed text-ink/55">
-              Şəkil yükləmə və xəritədə dəqiq yer backend Pill 3-də formu backend-ə birləşdirərkən
-              açılacaq — indi bildirişlər bu brauzerdə saxlanılır.
+              Bildiriş artıq canlı axınla sinxronlaşır; qoşulma mümkün olmasa, bu brauzerdə
+              qeydə alınır. Şəkil yükləmə və xəritədə dəqiq yer növbəti pillədə açılacaq.
             </p>
             <Link
               to="/listings"

@@ -14,6 +14,7 @@ import com.example.pawbaku.model.ReportEvent;
 import com.example.pawbaku.model.User;
 import com.example.pawbaku.repository.ReportEventRepository;
 import com.example.pawbaku.repository.ReportRepository;
+import com.example.pawbaku.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,13 +29,16 @@ public class ReportService {
 
     private final ReportRepository reportRepository;
     private final ReportEventRepository eventRepository;
+    private final UserRepository userRepository;
     private final CurrentUserService currentUserService;
 
     public ReportService(ReportRepository reportRepository,
                          ReportEventRepository eventRepository,
+                         UserRepository userRepository,
                          CurrentUserService currentUserService) {
         this.reportRepository = reportRepository;
         this.eventRepository = eventRepository;
+        this.userRepository = userRepository;
         this.currentUserService = currentUserService;
     }
 
@@ -140,6 +144,12 @@ public class ReportService {
             report.setVolunteer(actor);
             return;
         }
+        if (actor.isStaff()) {
+            User volunteer = userRepository.findFirstByRoleAndActiveTrueOrderByIdAsc(User.Role.VOLUNTEER)
+                    .orElseThrow(() -> new ForbiddenException("Hazırda aktiv könüllü yoxdur"));
+            report.setVolunteer(volunteer);
+            return;
+        }
         throw new ForbiddenException("Bu addım könüllü tərəfindən və ya moderator tərəfindən edilir");
     }
 
@@ -152,10 +162,14 @@ public class ReportService {
             report.setVet(vet);
             return;
         }
-        if (actor.getRole() == User.Role.VET || isSelf(report.getVolunteer(), actor) || actor.isStaff()) {
-            if (requestedVetId != null && actor.getRole() == User.Role.VET) {
-                report.setVet(actor);
-            }
+        if (actor.getRole() == User.Role.VET) {
+            report.setVet(actor);
+            return;
+        }
+        if (actor.isStaff() || isSelf(report.getVolunteer(), actor)) {
+            User vet = userRepository.findFirstByRoleAndActiveTrueOrderByIdAsc(User.Role.VET)
+                    .orElseThrow(() -> new ForbiddenException("Hazırda aktiv baytar yoxdur"));
+            report.setVet(vet);
             return;
         }
         throw new ForbiddenException("Bu addım baytar, təyin olunmuş könüllü və ya personal tərəfindən edilir");

@@ -1,8 +1,12 @@
 import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { Counter, Kicker, LinkButton, Reveal } from '../components/ui'
 import { FEED, HERO_STATS, MARQUEE_ITEMS, PawBadge, PawGlyph, renderMarquee } from '../lib/paw'
+import type { FeedItem } from '../lib/paw'
 import { getStoredReports, mergeFeed } from '../lib/store'
+import { fetchReports } from '../lib/api'
+import { reportDtoToFeedItem } from '../lib/mappers'
 
 const TRACK = [
   { title: 'Qeyd edin', text: 'Heyvanı xəritədə qeyd edin — şəkil, yer, vəziyyət.', tone: 'done' },
@@ -67,7 +71,25 @@ const MODULES: {
 
 export default function HomePage() {
   const { user } = useAuth()
-  const feed = mergeFeed(FEED, getStoredReports())
+  // null = still loading → show the built-in demo tiles; the server feed replaces them once loaded.
+  const [serverFeed, setServerFeed] = useState<FeedItem[] | null>(null)
+
+  useEffect(() => {
+    let active = true
+    fetchReports()
+      .then((reports) => {
+        if (active) setServerFeed(reports.map((dto) => reportDtoToFeedItem(dto)))
+      })
+      .catch(() => {
+        if (active) setServerFeed([])
+      })
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const base = serverFeed === null ? FEED : serverFeed
+  const feed = mergeFeed(base, getStoredReports())
 
   return (
     <div className="space-y-24">
@@ -284,7 +306,7 @@ export default function HomePage() {
       <section className="relative">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <Kicker>Canlı axın · demo</Kicker>
+            <Kicker>Canlı axın</Kicker>
             <h2 className="display mt-2 text-4xl text-ink sm:text-5xl">
               Bakıda <em className="not-italic text-brand-600">bu dəqiqələr</em>
             </h2>
@@ -348,6 +370,22 @@ export default function HomePage() {
             )
           })}
         </div>
+
+        {feed.length === 0 && (
+          <div className="mt-10 rounded-[2rem] border-2 border-dashed border-ink/25 bg-white px-6 py-14 text-center">
+            <p className="display text-2xl text-ink">İlk bildirişi siz qeyd edin</p>
+            <p className="mx-auto mt-1 max-w-sm text-sm font-medium text-ink/55">
+              Hazırda canlı axın boşdur — küçədə gördüyünüz heyvan üçün bildiriş verin.
+            </p>
+            <Link
+              to="/report"
+              className="pop-stick mt-6 inline-flex items-center gap-2 rounded-full border-2 border-ink bg-brand-600 px-7 py-3 text-sm font-extrabold text-white"
+            >
+              Kömək edin
+              <span aria-hidden>→</span>
+            </Link>
+          </div>
+        )}
       </section>
 
       {/* ------------------------------------------------------------- modules */}

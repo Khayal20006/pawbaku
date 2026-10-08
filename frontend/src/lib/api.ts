@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios'
-import type { ApiErrorBody } from './types'
+import type { ApiErrorBody, ListingDto, Page, ReportDto, ReportInput, ReportStatus } from './types'
 
 const TOKEN_KEY = 'pawbaku.token'
 
@@ -71,3 +71,46 @@ api.interceptors.response.use(
     return Promise.reject(new ApiError('Gözlənilməz xəta baş verdi.', status || 500))
   },
 )
+
+/* ------------------------------------------------------------------ resource endpoints */
+
+export interface ListingQuery {
+  status?: string
+  district?: string
+  species?: string
+}
+
+/** Public feed of lost/found listings, newest first. */
+export async function fetchListings(query: ListingQuery = {}): Promise<ListingDto[]> {
+  const { data } = await api.get<Page<ListingDto>>('/api/listings', {
+    params: { size: 200, ...query },
+  })
+  return data.content
+}
+
+/** Public feed of street-animal help reports, newest first. */
+export async function fetchReports(): Promise<ReportDto[]> {
+  const { data } = await api.get<ReportDto[]>('/api/reports')
+  return data
+}
+
+export async function fetchReport(id: number | string): Promise<ReportDto> {
+  const { data } = await api.get<ReportDto>(`/api/reports/${id}`)
+  return data
+}
+
+/** Creating a report requires an authenticated account (POST is behind the JWT). */
+export async function createReport(input: ReportInput): Promise<ReportDto> {
+  const { data } = await api.post<ReportDto>('/api/reports', input)
+  return data
+}
+
+/** Move a report to its next lifecycle step; the backend enforces roles and ordering. */
+export async function advanceReportStatus(
+  id: number | string,
+  status: ReportStatus,
+  note?: string,
+): Promise<ReportDto> {
+  const { data } = await api.patch<ReportDto>(`/api/reports/${id}/status`, { status, note })
+  return data
+}

@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FilterPill, Kicker, SectionTitle } from '../components/ui'
 import { KindTag, LISTINGS, PawBadge } from '../lib/paw'
 import type { ListingCard, ListingKind } from '../lib/paw'
+import { fetchListings } from '../lib/api'
+import { listingDtoToCard } from '../lib/mappers'
 
 const FILTERS = ['Hamısı', 'İtkin', 'Tapılmış'] as const
 type Filter = (typeof FILTERS)[number]
@@ -24,6 +26,20 @@ function metaChip(label: string, value: string) {
       <span className="uppercase tracking-wider text-ink/40">{label}</span>
       <span className="text-ink">{value}</span>
     </span>
+  )
+}
+
+function SkeletonCard() {
+  return (
+    <div className="animate-pulse overflow-hidden rounded-[2rem] border-2 border-ink/10 bg-white shadow-card">
+      <div className="aspect-[4/3] w-full bg-ink/5" />
+      <div className="space-y-3 p-5">
+        <div className="h-5 w-1/2 rounded-full bg-ink/10" />
+        <div className="h-3 w-2/3 rounded-full bg-ink/5" />
+        <div className="h-10 w-full rounded-2xl bg-ink/5" />
+        <div className="h-4 w-1/3 rounded-full bg-ink/5" />
+      </div>
+    </div>
   )
 }
 
@@ -101,9 +117,27 @@ function ListingCardView({ listing }: { listing: ListingCard }) {
 
 export default function ListingsPage() {
   const [active, setActive] = useState<Filter>('Hamısı')
+  const [cards, setCards] = useState<ListingCard[] | null>(null)
+
+  useEffect(() => {
+    let activeRequest = true
+    fetchListings({ status: 'ACTIVE' })
+      .then((listings) => {
+        if (activeRequest) setCards(listings.map((dto) => listingDtoToCard(dto)))
+      })
+      .catch(() => {
+        // Backend unreachable — show the built-in demo listings instead.
+        if (activeRequest) setCards(LISTINGS)
+      })
+    return () => {
+      activeRequest = false
+    }
+  }, [])
+
   const visible = active === 'Hamısı'
-    ? LISTINGS
-    : LISTINGS.filter((listing) => KIND_LABEL[listing.kind] === active)
+    ? (cards ?? [])
+    : (cards ?? []).filter((listing) => KIND_LABEL[listing.kind] === active)
+  const loading = cards === null
 
   return (
     <div className="animate-fade-in">
@@ -124,7 +158,7 @@ export default function ListingsPage() {
 
       <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-bold text-ink/50">
         <span>
-          <span className="text-ink">{visible.length}</span> elan göstərilir
+          <span className="text-ink">{loading ? '…' : visible.length}</span> elan göstərilir
         </span>
         <span className="inline-flex items-center gap-1.5">
           <span className="size-2 rounded-full bg-sea-500" /> aktiv elanlar hər gün 22:00-da yoxlanılır
@@ -132,12 +166,14 @@ export default function ListingsPage() {
       </div>
 
       <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {visible.map((listing) => (
-          <ListingCardView key={listing.id} listing={listing} />
-        ))}
+        {loading
+          ? Array.from({ length: 3 }, (_, index) => <SkeletonCard key={index} />)
+          : visible.map((listing) => (
+              <ListingCardView key={listing.id} listing={listing} />
+            ))}
       </div>
 
-      {visible.length === 0 && (
+      {!loading && visible.length === 0 && (
         <div className="mt-8 rounded-[2rem] border-2 border-dashed border-ink/25 bg-white px-6 py-14 text-center">
           <p className="display text-2xl text-ink">Bu filtr üzrə elan yoxdur</p>
           <p className="mx-auto mt-1 max-w-sm text-sm font-medium text-ink/55">

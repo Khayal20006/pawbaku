@@ -1,33 +1,28 @@
-import { useEffect, useState } from 'react'
 import { PawBadge, PawGlyph } from '../lib/paw'
-import { advanceReport, getReport, REPORT_FLOW, resetReport } from '../lib/store'
-import type { StoredReport } from '../lib/store'
+import { REPORT_FLOW } from '../lib/store'
+import type { TrackerReport } from '../lib/reports'
+
+interface ReportTrackerProps {
+  report: TrackerReport
+  busy?: boolean
+  advanceError?: string | null
+  onAdvance?: () => Promise<void> | void
+  onReset?: () => void
+}
 
 /**
- * Interactive tracker for a stored street-animal report. Lets the demo user
- * replay the whole lifecycle: REPORTED → VERIFIED → VOLUNTEER_ASSIGNED →
- * VET_CARE → RESOLVED, advancing each step as its responsible role.
+ * Lifecycle timeline for a street-animal report. The parent owns the report state
+ * and decides how to advance: localStorage (offline demo) or the reports API.
  */
-export default function ReportTracker({ reportId }: { reportId: string }) {
-  const [report, setReport] = useState<StoredReport | null>(() => getReport(reportId))
-
-  useEffect(() => {
-    setReport(getReport(reportId))
-  }, [reportId])
-
-  if (!report) return null
-
+export default function ReportTracker({
+  report,
+  busy = false,
+  advanceError = null,
+  onAdvance,
+  onReset,
+}: ReportTrackerProps) {
   const currentIndex = REPORT_FLOW.findIndex((step) => step.status === report.status)
   const finished = report.status === 'RESOLVED'
-
-  function handleNext() {
-    setReport(advanceReport(reportId))
-  }
-
-  function handleReset() {
-    setReport(resetReport(reportId))
-  }
-
   const nextStep = REPORT_FLOW[currentIndex + 1]
 
   return (
@@ -95,31 +90,46 @@ export default function ReportTracker({ reportId }: { reportId: string }) {
               <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             <p className="flex-1 text-sm font-extrabold text-sea-800">Axın tamamlandı — həll olundu.</p>
-            <button
-              type="button"
-              onClick={handleReset}
-              className="rounded-full border-2 border-ink bg-white px-4 py-1.5 text-xs font-extrabold text-ink transition hover:bg-sun-100"
-            >
-              Yenidən başlat
-            </button>
+            {onReset && (
+              <button
+                type="button"
+                onClick={onReset}
+                className="rounded-full border-2 border-ink bg-white px-4 py-1.5 text-xs font-extrabold text-ink transition hover:bg-sun-100"
+              >
+                Yenidən başlat
+              </button>
+            )}
           </div>
         ) : nextStep ? (
-          <div className="flex flex-wrap items-center gap-3 rounded-2xl bg-paper px-4 py-3">
-            <div className="flex-1">
-              <p className="text-[11px] font-extrabold uppercase tracking-wider text-ink/45">Növbəti addım</p>
-              <p className="text-sm font-extrabold text-ink">
-                {nextStep.by}: {nextStep.act}
-              </p>
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-wrap items-center gap-3 rounded-2xl bg-paper px-4 py-3">
+              <div className="flex-1">
+                <p className="text-[11px] font-extrabold uppercase tracking-wider text-ink/45">Növbəti addım</p>
+                <p className="text-sm font-extrabold text-ink">
+                  {nextStep.by}: {nextStep.act}
+                </p>
+              </div>
+              {onAdvance && (
+                <button
+                  type="button"
+                  onClick={() => void onAdvance()}
+                  disabled={busy}
+                  className="pop-stick inline-flex items-center gap-2 rounded-full border-2 border-ink bg-brand-600 px-5 py-2 text-sm font-extrabold text-white disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <PawGlyph className="size-4" />
+                  {busy ? 'Yoxlanılır…' : 'İrəli apar'}
+                  {!busy && <span aria-hidden>→</span>}
+                </button>
+              )}
             </div>
-            <button
-              type="button"
-              onClick={handleNext}
-              className="pop-stick inline-flex items-center gap-2 rounded-full border-2 border-ink bg-brand-600 px-5 py-2 text-sm font-extrabold text-white"
-            >
-              <PawGlyph className="size-4" />
-              İrəli apar
-              <span aria-hidden>→</span>
-            </button>
+            {advanceError && (
+              <p
+                className="rounded-2xl bg-rose-50 px-4 py-2.5 text-sm font-bold text-rose-700 ring-1 ring-rose-200"
+                role="alert"
+              >
+                {advanceError}
+              </p>
+            )}
           </div>
         ) : null}
       </div>
