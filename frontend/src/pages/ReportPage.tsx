@@ -1,10 +1,10 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { Kicker, LinkButton, SectionTitle } from '../components/ui'
+import ReportTracker from '../components/ReportTracker'
 import { PawBadge, PawGlyph } from '../lib/paw'
 import { BAKU_DISTRICTS } from '../lib/format'
-import { addReport, type NewReportInput } from '../lib/store'
-import type { FeedItem } from '../lib/paw'
+import { addReport, type NewReportInput, type StoredReport } from '../lib/store'
 
 const TIMELINE: { label: string; status: 'REPORTED' | 'VERIFIED' | 'VOLUNTEER_ASSIGNED' | 'VET_CARE' | 'RESOLVED' }[] = [
   { label: 'Şəkil + yer qeyd olundu', status: 'REPORTED' },
@@ -39,7 +39,7 @@ export default function ReportPage() {
   const [district, setDistrict] = useState(BAKU_DISTRICTS[0])
   const [description, setDescription] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const [done, setDone] = useState<FeedItem | null>(null)
+  const [done, setDone] = useState<StoredReport | null>(null)
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault()
@@ -71,50 +71,7 @@ export default function ReportPage() {
         <div className="mx-auto max-w-xl overflow-hidden rounded-[2rem] border-2 border-ink bg-white shadow-lift">
           <span className="block h-2 bg-gradient-to-r from-brand-500 via-sun-400 to-sea-500" aria-hidden />
           <div className="flex flex-col p-7 sm:p-9">
-            <span className="inline-flex size-14 items-center justify-center rounded-full border-2 border-ink bg-sea-500 text-white shadow-pop">
-              <svg viewBox="0 0 24 24" className="size-7" fill="none" stroke="currentColor" strokeWidth="2.4">
-                <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </span>
-
-            <div className="mt-5 flex items-center gap-3">
-              <span className="flex size-11 items-center justify-center rounded-full border-2 border-ink bg-brand-600 text-base font-extrabold text-white shadow-pop">
-                S
-              </span>
-              <div>
-                <p className="display text-xl leading-tight text-ink">{done.title}</p>
-                <p className="text-xs font-bold text-ink/50">
-                  {done.district} · {done.time}
-                </p>
-              </div>
-            </div>
-
-            <p className="mt-4 rounded-2xl bg-paper px-4 py-3 text-sm font-medium leading-relaxed text-ink/70">
-              {done.description}
-            </p>
-
-            <p className="mt-5 flex items-center gap-2">
-              <PawBadge status="REPORTED" />
-              <span className="text-xs font-bold text-ink/45">indi izlənir</span>
-            </p>
-
-            <ol className="mt-5 space-y-1">
-              {TIMELINE.map((step, index) => (
-                <li key={step.label} className="relative flex gap-4 pb-4">
-                  {index < TIMELINE.length - 1 && (
-                    <span className="absolute left-[7px] top-4 h-full border-l-2 border-dashed border-brand-200" aria-hidden />
-                  )}
-                  <span
-                    className={`relative mt-2 size-3.5 shrink-0 rounded-full border-[3px] border-white shadow ${
-                      index === 0 ? 'bg-brand-500' : 'bg-sun-300'
-                    }`}
-                  />
-                  <span className={`text-sm font-semibold ${index === 0 ? 'text-ink' : 'text-ink/55'}`}>
-                    {step.label}
-                  </span>
-                </li>
-              ))}
-            </ol>
+            <ReportTracker reportId={done.id} />
 
             <div className="mt-6 flex flex-wrap gap-3">
               <LinkButton to="/listings" className="pop-stick">

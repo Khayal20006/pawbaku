@@ -301,22 +301,23 @@ export default function HomePage() {
           {feed.map((item, index) => {
             const tints = ['bg-brand-100', 'bg-sea-100', 'bg-sun-100']
             const avatars = ['bg-brand-600', 'bg-sea-600', 'bg-sun-500']
-            return (
-              <Reveal key={item.title} delay={index * 90}>
-                <article className="group h-full overflow-hidden rounded-3xl border-2 border-ink bg-white shadow-card transition duration-300 hover:-translate-y-1 hover:shadow-pop">
-                  <span className={`block h-2 ${tints[index % tints.length]}`} aria-hidden />
-                  <div className="p-6">
-                    <div className="flex items-center justify-between gap-3">
-                      <span
-                        className={`flex size-10 items-center justify-center rounded-full border-2 border-ink text-sm font-extrabold text-white ${avatars[index % avatars.length]}`}
-                      >
-                        {item.avatar}
-                      </span>
-                      <PawBadge status={item.status} />
-                    </div>
-                    <h3 className="display mt-4 text-2xl text-ink">{item.title}</h3>
-                    <p className="mt-2 text-sm font-medium leading-relaxed text-ink/60">{item.description}</p>
-                    <p className="card-rule mt-5 flex items-center gap-2 pb-1 pt-4 text-xs font-bold text-ink/45">
+            const trackable = item.id ? `/track/${item.id}` : null
+            const card = (
+              <article className="group h-full overflow-hidden rounded-3xl border-2 border-ink bg-white shadow-card transition duration-300 hover:-translate-y-1 hover:shadow-pop">
+                <span className={`block h-2 ${tints[index % tints.length]}`} aria-hidden />
+                <div className="p-6">
+                  <div className="flex items-center justify-between gap-3">
+                    <span
+                      className={`flex size-10 items-center justify-center rounded-full border-2 border-ink text-sm font-extrabold text-white ${avatars[index % avatars.length]}`}
+                    >
+                      {item.avatar}
+                    </span>
+                    <PawBadge status={item.status} />
+                  </div>
+                  <h3 className="display mt-4 text-2xl text-ink">{item.title}</h3>
+                  <p className="mt-2 text-sm font-medium leading-relaxed text-ink/60">{item.description}</p>
+                  <p className="card-rule mt-5 flex items-center justify-between gap-2 pb-1 pt-4 text-xs font-bold text-ink/45">
+                    <span className="flex items-center gap-2">
                       <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2">
                         <path
                           d="M12 21c-4.5-3.4-7-6.4-7-9.6a7 7 0 1 1 14 0c0 3.2-2.5 6.2-7 9.6zM10 11h4"
@@ -324,9 +325,25 @@ export default function HomePage() {
                         />
                       </svg>
                       {item.district} · {item.time}
-                    </p>
-                  </div>
-                </article>
+                    </span>
+                    {trackable && (
+                      <span className="flex items-center gap-1 font-extrabold text-brand-600 opacity-0 transition group-hover:opacity-100">
+                        İzlə <span aria-hidden>→</span>
+                      </span>
+                    )}
+                  </p>
+                </div>
+              </article>
+            )
+            return (
+              <Reveal key={item.title} delay={index * 90}>
+                {trackable ? (
+                  <Link to={trackable} className="block h-full">
+                    {card}
+                  </Link>
+                ) : (
+                  card
+                )}
               </Reveal>
             )
           })}

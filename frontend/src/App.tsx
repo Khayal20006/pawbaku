@@ -7,6 +7,7 @@ import HomePage from './pages/HomePage'
 import ListingsPage from './pages/ListingsPage'
 import ReportPage from './pages/ReportPage'
 import AdoptPage from './pages/AdoptPage'
+import TrackPage from './pages/TrackPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import ProfilePage from './pages/ProfilePage'
@@ -20,6 +21,7 @@ export default function App() {
           <Route index element={<HomePage />} />
           <Route path="listings" element={<ListingsPage />} />
           <Route path="report" element={<ReportPage />} />
+          <Route path="track/:id" element={<TrackPage />} />
           <Route path="adopt" element={<AdoptPage />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />

@@ -48,6 +48,7 @@ export interface ListingCard {
 }
 
 export interface FeedItem {
+  id?: string
   title: string
   description: string
   status: ReportStatus
