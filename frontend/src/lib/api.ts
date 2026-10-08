@@ -72,12 +72,15 @@ api.interceptors.response.use(
     const body = error.response?.data
 
     if (status === 401) {
-      // The token expired or was revoked: drop it and bounce to the login screen.
-      // Public auth endpoints are exempt — an OTP/login hiccup must never boot the
-      // user off the register page, they just retry on the form.
+      // Token expired or got revoked: drop it and, only on a genuinely protected page,
+      // bounce to the login screen. Public pages (register/login/feed) must never be
+      // hijacked by a background session refresh failing — the visitor simply retries.
+      // ProtectedRoute already sends /profile, /admin visitors to login on its own.
       const publicAuth = error.config?.url?.startsWith('/api/auth/') ?? false
+      const path = window.location.pathname
+      const onProtectedPage = path.startsWith('/profile') || path.startsWith('/admin')
       setToken(null)
-      if (!publicAuth && !window.location.pathname.startsWith('/login')) {
+      if (!publicAuth && onProtectedPage) {
         window.location.assign('/login')
       }
       return Promise.reject(new ApiError('Sessiya sona çatdı. Yenidən daxil olun.', status))
