@@ -55,15 +55,18 @@ public class JwtService {
 
     public String issue(User user) {
         Instant now = Instant.now();
-        JwtClaimsSet claims = JwtClaimsSet.builder()
+        JwtClaimsSet.Builder builder = JwtClaimsSet.builder()
                 .issuer(properties.issuer())
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(properties.expirationSeconds()))
                 .subject(user.getUsername())
                 .claim(CLAIM_USER_ID, user.getId())
-                .claim(CLAIM_ROLES, List.of("ROLE_" + user.getRole().name()))
-                .claim(CLAIM_FULL_NAME, user.getFullName())
-                .build();
+                .claim(CLAIM_ROLES, List.of("ROLE_" + user.getRole().name()));
+        // fullName is optional in the register form; JwtClaimsSet rejects null values.
+        if (user.getFullName() != null) {
+            builder.claim(CLAIM_FULL_NAME, user.getFullName());
+        }
+        JwtClaimsSet claims = builder.build();
 
         JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).type("JWT").build();
         return encoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
