@@ -2,10 +2,10 @@ package com.example.pawbaku.dto;
 
 import java.time.Instant;
 
-import com.example.pawbaku.model.Animal;
 import com.example.pawbaku.model.Listing;
+import com.example.pawbaku.service.MatchService.Match;
 
-/** İtkin / Tapılmış elanı + hered profile, ready for the listings grid. */
+/** İtkin / Tapılmış elanı + heyvan profili + hesablanmış uyğunluq balı. */
 public record ListingResponse(
         Long id,
         Listing.Kind kind,
@@ -18,9 +18,11 @@ public record ListingResponse(
         Instant createdAt,
         AuthResponse.UserResponse createdBy,
         AnimalResponse animal,
-        int matchScore) {
+        int matchScore,
+        Long matchListingId,
+        String matchListingName) {
 
-    public static ListingResponse of(Listing listing, int matchScore) {
+    public static ListingResponse of(Listing listing, Match match) {
         return new ListingResponse(
                 listing.getId(),
                 listing.getKind(),
@@ -33,12 +35,8 @@ public record ListingResponse(
                 listing.getCreatedAt(),
                 AuthResponse.UserResponse.of(listing.getCreatedBy()),
                 AnimalResponse.of(listing.getAnimal()),
-                matchScore);
-    }
-
-    /** Deterministic 50-100 demo score so the grid looks alive until the real matcher lands. */
-    public static int demoMatchScore(long listingId) {
-        int value = 50 + (int) (Math.abs(listingId * 37L) % 51);
-        return Math.min(100, value);
+                match == null ? 0 : match.score(),
+                match == null ? null : match.listingId(),
+                match == null ? null : match.listingName());
     }
 }

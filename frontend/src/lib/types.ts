@@ -55,6 +55,8 @@ export interface ListingDto {
   createdBy: User
   animal: AnimalDto
   matchScore: number
+  matchListingId: number | null
+  matchListingName: string | null
 }
 
 export interface ListingInput {

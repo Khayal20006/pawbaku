@@ -64,6 +64,36 @@ function ListingDetailView({ listing }: { listing: ListingDto }) {
               <DetailRow label="Qeyd olundu" value={formatDateTime(listing.createdAt)} />
             </div>
 
+            {listing.matchListingId != null ? (
+              <div className="mt-6 flex items-center gap-4 rounded-2xl border-2 border-ink/15 bg-sun-100/60 p-4">
+                <span
+                  className={`flex size-12 shrink-0 items-center justify-center rounded-full border-2 border-ink text-base font-extrabold tabular-nums ${
+                    listing.matchScore >= 65 ? 'bg-emerald-500 text-white' : 'bg-white text-ink'
+                  }`}
+                >
+                  {listing.matchScore}
+                </span>
+                <div className="min-w-0">
+                  <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-ink/45">
+                    Ən yaxşı uyğunluq {listing.matchScore >= 65 ? '· güclü' : ''}
+                  </p>
+                  <p className="truncate text-sm font-extrabold text-ink">
+                    {listing.matchListingName || 'Adsız dost'} — elan #{listing.matchListingId}
+                  </p>
+                  <p className="text-xs font-semibold text-ink/55">
+                    Növ, rəng, ölçü, məsafə və vaxt ölçüləri ilə hesablanıb.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="mt-6 rounded-2xl border-2 border-dashed border-ink/20 bg-paper p-4">
+                <p className="text-xs font-semibold text-ink/55">
+                  İndiyədək bu elana yaxın uyğun elan qeydə alınmayıb — yeni elan verildikcə bal avtomatik
+                  hesablanır.
+                </p>
+              </div>
+            )}
+
             <div className="mt-6 flex items-center gap-4 rounded-2xl bg-paper p-4">
               <span className="flex size-11 shrink-0 items-center justify-center rounded-full border-2 border-ink bg-brand-600 text-sm font-extrabold text-white">
                 {(creator.fullName || creator.username).slice(0, 2).toUpperCase()}

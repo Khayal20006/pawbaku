@@ -5,13 +5,13 @@ import { Counter, Kicker, LinkButton, Reveal } from '../components/ui'
 import { FEED, HERO_STATS, MARQUEE_ITEMS, PawBadge, PawGlyph, renderMarquee } from '../lib/paw'
 import type { FeedItem } from '../lib/paw'
 import { getStoredReports, mergeFeed } from '../lib/store'
-import { fetchReports } from '../lib/api'
+import { fetchAdoptions, fetchListings, fetchReports } from '../lib/api'
 import { reportDtoToFeedItem } from '../lib/mappers'
 
 const TRACK = [
-  { title: 'Qeyd edin', text: 'Heyvanı xəritədə qeyd edin — şəkil, yer, vəziyyət.', tone: 'done' },
+  { title: 'Qeyd edin', text: 'Heyvanı qeyd edin — şəkil, yer, vəziyyət.', tone: 'done' },
   { title: 'Doğrulanır', text: 'Moderator elanı yoxlayır, ehtiyac təsdiqlənir.', tone: 'done' },
-  { title: 'Könüllü yolda', text: 'Yaxınlıqdakı könüllü bildiriş alır, yerə gedir.', tone: 'live' },
+  { title: 'Könüllü yolda', text: 'Könüllü təyin edilir və yerə gedir.', tone: 'live' },
   { title: 'Həll', text: 'Baytar yardımı, ev, sağalma — son nəticə izlənilir.', tone: 'next' },
 ] as const
 
@@ -32,7 +32,7 @@ const MODULES: {
     ring: 'text-brand-600 bg-brand-500',
     tag: 'Elan + Matcher',
     title: 'İtkin & Tapılmış',
-    text: 'Elan, şəkil, xəritə. Sistem növ, rəng, məsafə və vaxta görə uyğunluq balı hesablayır, hər iki tərəfə bildiriş göndərir.',
+    text: 'Elan, şəkil, xəritə. Sistem növ, rəng, ölçü, məsafə və vaxta görə uyğunluq balı hesablayır — hədd 65.',
     to: '/listings',
     stat: '4 aktiv elan',
   },
@@ -73,12 +73,26 @@ export default function HomePage() {
   const { user } = useAuth()
   // null = still loading → show the built-in demo tiles; the server feed replaces them once loaded.
   const [serverFeed, setServerFeed] = useState<FeedItem[] | null>(null)
+  const [live, setLive] = useState<{ listings: number; adoptions: number; topMatch: number }>({
+    listings: 0,
+    adoptions: 0,
+    topMatch: 0,
+  })
 
   useEffect(() => {
     let active = true
-    fetchReports()
-      .then((reports) => {
-        if (active) setServerFeed(reports.map((dto) => reportDtoToFeedItem(dto)))
+    Promise.all([fetchReports(), fetchListings(), fetchAdoptions()])
+      .then(([reports, listings, pets]) => {
+        if (!active) return
+        setServerFeed(reports.map((dto) => reportDtoToFeedItem(dto)))
+        const activeListings = listings.filter(
+          (l) => l.status === 'ACTIVE' || l.status === 'REOPENED',
+        ).length
+        setLive({
+          listings: activeListings,
+          adoptions: pets.length,
+          topMatch: Math.max(0, ...listings.map((l) => l.matchScore)),
+        })
       })
       .catch(() => {
         if (active) setServerFeed([])
@@ -121,7 +135,7 @@ export default function HomePage() {
                 <p className="mt-6 max-w-xl text-lg font-medium leading-relaxed text-ink/70 sm:text-xl">
                   İtkin heyvanı tap, küçədə gördüyünə kömək et, sahibini gözləyənə{' '}
                   <span className="font-extrabold text-sea-700">yeni ev</span> tap. Sistem özü
-                  uyğunlaşdırır və bildirir.
+                  uyğunlaşdırır.
                 </p>
               </Reveal>
 
@@ -181,7 +195,7 @@ export default function HomePage() {
                   />
                   <figcaption className="absolute inset-x-3 bottom-3 flex items-center justify-between gap-2">
                     <span className="rounded-full border-2 border-ink bg-white px-3 py-1 text-xs font-extrabold text-ink">
-                      “Reks” korgi — <span className="text-brand-600">87 bal</span> uyğunluq
+                      “Reks” korgi — <span className="text-brand-600">uyğunluq balı canlı hesablanır</span>
                     </span>
                     <span className="flex items-center gap-1.5 rounded-full border-2 border-ink bg-ink px-3 py-1 text-[11px] font-extrabold text-white">
                       <span className="relative flex size-2">
@@ -212,7 +226,7 @@ export default function HomePage() {
                   aria-hidden
                 >
                   <span className="text-[10px] uppercase tracking-wider">Uyğunlaşdırma</span>
-                  <Counter to={90} /> bal
+                  <Counter to={live.topMatch} /> bal
                 </span>
               </div>
             </Reveal>
@@ -441,7 +455,15 @@ export default function HomePage() {
                   <h3 className="display mt-5 text-3xl text-ink">{module.title}</h3>
                   <p className="mt-3 max-w-md text-sm font-medium leading-relaxed text-ink/65">{module.text}</p>
                   <p className="card-rule mt-6 flex items-center justify-between pb-3 pt-4">
-                    <span className="text-sm font-extrabold text-ink">{module.stat}</span>
+                    <span className="text-sm font-extrabold text-ink">
+                      {module.title === 'İtkin & Tapılmış'
+                        ? `${live.listings} aktiv elan`
+                        : module.title === 'Övladlığa götürmə'
+                          ? `${live.adoptions} bala ev axtarır`
+                          : module.title === 'Küçə heyvanına kömək'
+                            ? `${feed.length} canlı qeyd`
+                            : module.stat}
+                    </span>
                     <span className="inline-flex items-center gap-1.5 text-sm font-extrabold text-brand-700 transition group-hover:gap-3">
                       Daxil ol <span aria-hidden>→</span>
                     </span>

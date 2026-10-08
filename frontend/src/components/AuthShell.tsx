@@ -5,7 +5,7 @@ import { PawGlyph } from '../lib/paw'
 
 const POINTS = [
   'Elanı xəritədə bir dəqiqəyə verin',
-  'Sistem uyğunluq balı hesablayır, bildiriş göndərir',
+  'Sistem uyğunluq balı hesablayır',
   'Köməyin axınını real vaxtda izləyin',
 ]
 

@@ -1,5 +1,8 @@
 package com.example.pawbaku.repository;
 
+import java.util.List;
+import java.util.Optional;
+
 import com.example.pawbaku.model.Listing;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +27,12 @@ public interface ListingRepository extends JpaRepository<Listing, Long> {
     @EntityGraph(attributePaths = {"animal"})
     @Query("select l from Listing l where l.id = :id")
     java.util.Optional<Listing> findWithAnimalById(@Param("id") Long id);
+
+    @EntityGraph(attributePaths = {"animal"})
+    List<Listing> findByStatusAndKind(Listing.Status status, Listing.Kind kind);
+
+    @EntityGraph(attributePaths = {"animal"})
+    List<Listing> findByStatus(Listing.Status status);
 
     long countByStatus(Listing.Status status);
 }

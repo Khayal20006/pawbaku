@@ -1,5 +1,7 @@
 package com.example.pawbaku.service;
 
+import java.util.List;
+
 import com.example.pawbaku.dto.ListingRequest;
 import com.example.pawbaku.dto.ListingResponse;
 import com.example.pawbaku.dto.PageResponse;
@@ -22,13 +24,16 @@ public class ListingService {
     private final ListingRepository listingRepository;
     private final AnimalRepository animalRepository;
     private final CurrentUserService currentUserService;
+    private final MatchService matchService;
 
     public ListingService(ListingRepository listingRepository,
                           AnimalRepository animalRepository,
-                          CurrentUserService currentUserService) {
+                          CurrentUserService currentUserService,
+                          MatchService matchService) {
         this.listingRepository = listingRepository;
         this.animalRepository = animalRepository;
         this.currentUserService = currentUserService;
+        this.matchService = matchService;
     }
 
     @Transactional(readOnly = true)
@@ -36,15 +41,16 @@ public class ListingService {
                                                  int page, int size) {
         Pageable pageable = PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), 200));
         Page<Listing> result = listingRepository.search(kind, status, pageable);
+        List<Listing> pool = listingRepository.findByStatus(Listing.Status.ACTIVE);
         return PageResponse.of(result.map(listing ->
-                ListingResponse.of(listing, ListingResponse.demoMatchScore(listing.getId()))));
+                ListingResponse.of(listing, matchService.bestMatchOver(listing, pool))));
     }
 
     @Transactional(readOnly = true)
     public ListingResponse findById(Long id) {
         Listing listing = listingRepository.findWithAnimalById(id)
                 .orElseThrow(() -> ResourceNotFoundException.of("Elan", id));
-        return ListingResponse.of(listing, ListingResponse.demoMatchScore(listing.getId()));
+        return ListingResponse.of(listing, matchService.bestMatch(listing));
     }
 
     @Transactional
@@ -77,7 +83,7 @@ public class ListingService {
                 .animal(animal)
                 .build();
         listing = listingRepository.save(listing);
-        return ListingResponse.of(listing, ListingResponse.demoMatchScore(listing.getId()));
+        return ListingResponse.of(listing, matchService.bestMatch(listing));
     }
 
     private static String blankToNull(String value) {

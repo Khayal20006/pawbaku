@@ -64,7 +64,7 @@ export const MARQUEE_ITEMS = [
   'Övladlığa götürmə',
   'Küçə heyvanına kömək',
   'Uyğunluq balı',
-  'Telegram bildiriş',
+  'Bildirişlər · Milestone 2',
   'Foster · Milestone 2',
   'Sığınacaq · Milestone 2',
   'Sahibsiz heyvanlar',

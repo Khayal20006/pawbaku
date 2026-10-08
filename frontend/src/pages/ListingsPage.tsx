@@ -144,7 +144,7 @@ export default function ListingsPage() {
       <SectionTitle
         kicker="İtkin & Tapılmış"
         title="Elanlar"
-        description="Sistem növ, rəng, məsafə və vaxta görə uyğunluq balı hesablayır — sahibi və tapan tərəf avtomatik bildiriş alır."
+        description="Sistem növ, rəng, ölçü, məsafə və vaxta görə uyğunluq balı hesablayır — sahibi və tapan tərəf üçün qoşa uyğunluq tapılır."
         action={
           <div className="flex flex-wrap gap-2">
             {FILTERS.map((filter) => (
@@ -161,7 +161,7 @@ export default function ListingsPage() {
           <span className="text-ink">{loading ? '…' : visible.length}</span> elan göstərilir
         </span>
         <span className="inline-flex items-center gap-1.5">
-          <span className="size-2 rounded-full bg-sea-500" /> aktiv elanlar hər gün 22:00-da yoxlanılır
+          <span className="size-2 rounded-full bg-sea-500" /> elan statusu moderator tərəfindən idarə olunur
         </span>
       </div>
 
@@ -188,9 +188,9 @@ export default function ListingsPage() {
 
       <div className="mt-10 grid gap-4 sm:grid-cols-3">
         {[
-          { value: '50 m', tint: 'text-sea-600', label: 'yer həssaslığı', text: 'Eyni növdə, 50 m radiusda uyğun elan axtarılır.' },
-          { value: '24 h', tint: 'text-brand-600', label: 'təkrarlama pəncərəsi', text: 'Eyni heyvan üçün təkrar elan filtrasiyası.' },
-          { value: '0,65', tint: 'text-sun-600', label: 'uyğunluq həddi', text: 'Bu baldan yuxarı hər iki tərəf bildiriş alır.' },
+          { value: '50 m', tint: 'text-sea-600', label: 'yer həssaslığı', text: 'Məsafə 50 m və altında olan qoşa elan tam yer balı alır.' },
+          { value: '24 h', tint: 'text-brand-600', label: 'vaxt pəncərəsi', text: '24 saat ərzində qeyd edilən elanlar tam vaxt balı alır, 7 gündə sıfıra düşür.' },
+          { value: '0,65', tint: 'text-sun-600', label: 'uyğunluq həddi', text: '65+ bal güclü uyğunluq sayılır — sahibi və tapan tərəf elanlarına işarələnir.' },
         ].map((item) => (
           <div key={item.label} className="pop-stick rounded-3xl border-2 border-ink bg-white px-6 py-5">
             <p className={`display text-4xl tabular-nums ${item.tint}`}>{item.value}</p>
