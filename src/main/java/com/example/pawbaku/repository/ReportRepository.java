@@ -18,5 +18,8 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     @EntityGraph(attributePaths = {"reporter", "volunteer", "vet", "verifiedBy"})
     Optional<Report> findWithPeopleById(Long id);
 
+    @EntityGraph(attributePaths = {"reporter", "volunteer", "vet", "verifiedBy"})
+    List<Report> findByReporterIdOrderByIdDesc(Long reporterId);
+
     long countByStatus(Report.Status status);
 }

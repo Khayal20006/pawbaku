@@ -91,6 +91,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/listings/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/reports/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/adoptions/**").permitAll()
+                        .requestMatchers("/api/health").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(handling -> handling

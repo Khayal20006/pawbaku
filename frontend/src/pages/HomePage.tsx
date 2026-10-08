@@ -327,6 +327,16 @@ export default function HomePage() {
             const card = (
               <article className="group h-full overflow-hidden rounded-3xl border-2 border-ink bg-white shadow-card transition duration-300 hover:-translate-y-1 hover:shadow-pop">
                 <span className={`block h-2 ${tints[index % tints.length]}`} aria-hidden />
+                {item.photo && (
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={item.photo}
+                      alt=""
+                      loading="lazy"
+                      className="aspect-[16/9] w-full bg-brand-100 object-cover transition duration-500 group-hover:scale-[1.03]"
+                    />
+                  </div>
+                )}
                 <div className="p-6">
                   <div className="flex items-center justify-between gap-3">
                     <span

@@ -147,3 +147,50 @@ export interface UserUpdateInput {
   role?: Role
   active?: boolean
 }
+
+export type PetStatus = 'AVAILABLE' | 'ADOPTED' | 'ARCHIVED'
+export type ApplicationStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
+
+/** Adoptable pet as returned by the backend. */
+export interface PetDto {
+  id: number
+  name: string
+  species: AnimalSpecies
+  breed: string | null
+  gender: AnimalGender
+  ageMonths: number | null
+  size: AnimalSize | null
+  color: string | null
+  about: string | null
+  photoUrl: string | null
+  status: PetStatus
+  createdAt: string
+  createdBy: { id: number; username: string; fullName: string | null }
+}
+
+export interface PetInput {
+  name: string
+  species: AnimalSpecies
+  breed?: string
+  gender?: AnimalGender
+  ageMonths?: number
+  size?: AnimalSize
+  color?: string
+  about?: string
+  photoUrl?: string
+}
+
+/** Adoption application as returned by the backend. */
+export interface ApplicationDto {
+  id: number
+  petId: number
+  petName: string
+  message: string | null
+  status: ApplicationStatus
+  createdAt: string
+  applicant: { id: number; username: string; fullName: string | null }
+}
+
+export interface HealthDto {
+  status: string
+}

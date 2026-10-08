@@ -1,10 +1,12 @@
 package com.example.pawbaku.config;
 
+import com.example.pawbaku.model.AdoptablePet;
 import com.example.pawbaku.model.Animal;
 import com.example.pawbaku.model.Listing;
 import com.example.pawbaku.model.Report;
 import com.example.pawbaku.model.ReportEvent;
 import com.example.pawbaku.model.User;
+import com.example.pawbaku.repository.AdoptablePetRepository;
 import com.example.pawbaku.repository.AnimalRepository;
 import com.example.pawbaku.repository.ListingRepository;
 import com.example.pawbaku.repository.ReportEventRepository;
@@ -43,6 +45,7 @@ public class DataInitializer implements ApplicationRunner {
     private final ListingRepository listingRepository;
     private final ReportRepository reportRepository;
     private final ReportEventRepository eventRepository;
+    private final AdoptablePetRepository petRepository;
     private final BootstrapProperties properties;
     private final DemoProperties demoProperties;
 
@@ -52,6 +55,7 @@ public class DataInitializer implements ApplicationRunner {
                            ListingRepository listingRepository,
                            ReportRepository reportRepository,
                            ReportEventRepository eventRepository,
+                           AdoptablePetRepository petRepository,
                            BootstrapProperties properties,
                            DemoProperties demoProperties) {
         this.userRepository = userRepository;
@@ -60,6 +64,7 @@ public class DataInitializer implements ApplicationRunner {
         this.listingRepository = listingRepository;
         this.reportRepository = reportRepository;
         this.eventRepository = eventRepository;
+        this.petRepository = petRepository;
         this.properties = properties;
         this.demoProperties = demoProperties;
     }
@@ -70,6 +75,7 @@ public class DataInitializer implements ApplicationRunner {
         User admin = seedAdmin();
         if (demoProperties.seed()) {
             seedDemoData(admin);
+            seedPets(admin);
         }
     }
 
@@ -125,6 +131,31 @@ public class DataInitializer implements ApplicationRunner {
                 Report.Status.VERIFIED, "Suraxanı", null, "40.4297", "49.9802");
 
         log.info("Demo məlumatlar toxumlandı (heyvanlar, elanlar, bildirişlər).");
+    }
+
+    private void seedPets(User owner) {
+        if (petRepository.countByStatus(AdoptablePet.PetStatus.AVAILABLE) > 0) {
+            return;
+        }
+        pet(owner, "Mila", "Tapılıb: mehriban, uşaqla rahat yola gedir.", "/mock-1108099.jpg");
+        pet(owner, "Bars", "Aktiv it, həyətli ev üçün ideal — təlimə açıqdır.", "/hero-paw.jpg");
+        pet(owner, "Cındır", "Yaşlı və təmkinli — isti divanda qocalmaq istəyir.", "/hero-paw-2.jpg");
+    }
+
+    private void pet(User owner, String name, String about, String photoUrl) {
+        petRepository.save(AdoptablePet.builder()
+                .name(name)
+                .species(Animal.Species.CAT)
+                .breed(null)
+                .gender(Animal.Gender.UNKNOWN)
+                .ageMonths(24)
+                .size(Animal.Size.MEDIUM)
+                .color(null)
+                .about(about)
+                .photoUrl(photoUrl)
+                .status(AdoptablePet.PetStatus.AVAILABLE)
+                .createdBy(owner)
+                .build());
     }
 
     private User ensureUser(String username, String email, String fullName, User.Role role) {

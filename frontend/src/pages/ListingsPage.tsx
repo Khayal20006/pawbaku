@@ -103,7 +103,7 @@ function ListingCardView({ listing }: { listing: ListingCard }) {
             {listing.eventTime}
           </span>
           <Link
-            to="/register"
+            to={`/listings/${listing.numericId}`}
             className="pop-stick inline-flex items-center gap-1.5 rounded-full border-2 border-ink bg-brand-600 px-4 py-2 text-xs font-extrabold text-white"
           >
             Ətraflı bax
@@ -207,7 +207,7 @@ export default function ListingsPage() {
         </p>
         <div className="mt-6 inline-flex flex-wrap justify-center gap-3">
           <Link
-            to="/register"
+            to="/listings/new"
             className="pop-stick inline-flex items-center gap-2 rounded-full border-2 border-ink bg-brand-600 px-7 py-3 text-sm font-extrabold text-white"
           >
             Elan ver

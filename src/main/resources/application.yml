@@ -59,6 +59,8 @@ server:
     include-binding-errors: always
 
 pawbaku:
+  uploads:
+    dir: ${UPLOADS_DIR:uploads}
   security:
     jwt:
       # HS256 requires at least a 256-bit key. Always supplied from outside the repository.

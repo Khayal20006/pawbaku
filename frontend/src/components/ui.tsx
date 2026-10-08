@@ -6,6 +6,7 @@ import {
   type ReactNode,
 } from 'react'
 import { Link } from 'react-router-dom'
+import { ApiError, uploadImage } from '../lib/api'
 
 /* ------------------------------------------------------------------ primitives */
 
@@ -320,6 +321,97 @@ export function FilterPill({
     >
       {children}
     </button>
+  )
+}
+
+/** Şəkil seçib yükləyən düymə — nəticəni {url} kimi qaytarır (autentifikasiya tələb olunur). */
+export function ImageUpload({
+  value,
+  onChange,
+  disabled,
+}: {
+  value: string | null
+  onChange: (url: string | null) => void
+  disabled?: boolean
+}) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handlePick(file: File | undefined) {
+    if (!file) return
+    setError(null)
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      setError('Yalnız JPG, PNG və ya WEBP şəkli qəbul olunur.')
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Şəkil 5 MB-dan böyük ola bilməz.')
+      return
+    }
+    setBusy(true)
+    try {
+      onChange(await uploadImage(file))
+    } catch (cause) {
+      setError(cause instanceof ApiError ? cause.message : 'Şəkil yüklənmədi.')
+    } finally {
+      setBusy(false)
+      if (inputRef.current) inputRef.current.value = ''
+    }
+  }
+
+  return (
+    <div>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        className="sr-only"
+        disabled={disabled || busy}
+        onChange={(event) => void handlePick(event.target.files?.[0])}
+      />
+      {value ? (
+        <div className="relative overflow-hidden rounded-2xl border-2 border-ink">
+          <img src={value} alt="Yüklənmiş şəkil" className="aspect-[4/3] w-full bg-brand-100 object-cover" />
+          <button
+            type="button"
+            onClick={() => onChange(null)}
+            className="absolute right-2 top-2 rounded-full border-2 border-ink bg-white px-3 py-1 text-xs font-extrabold text-ink shadow-pop"
+          >
+            Sil
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          disabled={disabled || busy}
+          onClick={() => inputRef.current?.click()}
+          className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-ink/30 bg-white px-4 py-6 text-sm font-bold text-ink/50 transition hover:border-brand-500 hover:text-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {busy ? (
+            <>
+              <Spinner className="size-4 text-brand-600" /> Yüklənir…
+            </>
+          ) : (
+            <>
+              <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <path
+                  d="M12 16V4m0 0l-4 4m4-4l4 4M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              {disabled ? 'Şəkil üçün hesaba daxil olun' : 'Şəkil əlavə et (JPG/PNG/WEBP, ≤5 MB)'}
+            </>
+          )}
+        </button>
+      )}
+      {error && (
+        <span className="mt-1.5 block text-xs font-medium text-rose-700" role="alert">
+          {error}
+        </span>
+      )}
+    </div>
   )
 }
 

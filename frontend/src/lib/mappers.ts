@@ -13,6 +13,7 @@ export function listingDtoToCard(dto: ListingDto): ListingCard {
   const animal = dto.animal
   return {
     id: `L-${dto.id}`,
+    numericId: dto.id,
     kind: dto.kind,
     status: toListingStatus(dto.status),
     animal: {
@@ -41,5 +42,6 @@ export function reportDtoToFeedItem(dto: ReportDto): FeedItem {
     district: tracker.district,
     time: tracker.time,
     avatar: tracker.avatar,
+    photo: dto.photoUrl,
   }
 }

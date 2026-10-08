@@ -79,6 +79,14 @@ public class ReportService {
     }
 
     @Transactional(readOnly = true)
+    public List<ReportResponse> mine() {
+        User actor = currentUserService.require();
+        return reportRepository.findByReporterIdOrderByIdDesc(actor.getId()).stream()
+                .map(report -> ReportResponse.of(report, eventRepository.findByReportIdOrderByIdAsc(report.getId())))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public ReportResponse findById(Long id) {
         Report report = requireReport(id);
         return ReportResponse.of(report, eventRepository.findByReportIdOrderByIdAsc(id));

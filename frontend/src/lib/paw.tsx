@@ -38,6 +38,7 @@ export interface AnimalProfile {
 
 export interface ListingCard {
   id: string
+  numericId: number
   kind: ListingKind
   status: ListingStatus
   animal: AnimalProfile
@@ -55,6 +56,7 @@ export interface FeedItem {
   district: string
   time: string
   avatar: string
+  photo?: string | null
 }
 
 export const MARQUEE_ITEMS = [
@@ -71,6 +73,7 @@ export const MARQUEE_ITEMS = [
 export const LISTINGS: ListingCard[] = [
   {
     id: 'L-1042',
+    numericId: 1042,
     kind: 'FOUND',
     status: 'ACTIVE',
     animal: {
@@ -89,6 +92,7 @@ export const LISTINGS: ListingCard[] = [
   },
   {
     id: 'L-1041',
+    numericId: 1041,
     kind: 'LOST',
     status: 'ACTIVE',
     animal: {
@@ -107,6 +111,7 @@ export const LISTINGS: ListingCard[] = [
   },
   {
     id: 'L-1040',
+    numericId: 1040,
     kind: 'FOUND',
     status: 'ACTIVE',
     animal: {
@@ -125,6 +130,7 @@ export const LISTINGS: ListingCard[] = [
   },
   {
     id: 'L-1039',
+    numericId: 1039,
     kind: 'LOST',
     status: 'ACTIVE',
     animal: {

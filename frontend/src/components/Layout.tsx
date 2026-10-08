@@ -36,6 +36,11 @@ export default function Layout() {
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
+  const navItems = [...NAV_ITEMS]
+  if (user && ['ADMIN', 'MODERATOR', 'SHELTER_STAFF'].includes(user.role)) {
+    navItems.push({ to: '/admin', label: 'İdarə' })
+  }
+
   useEffect(() => {
     function onScroll() {
       setScrolled(window.scrollY > 8)
@@ -82,7 +87,7 @@ komak@pawbaku.az
           <Logo />
 
           <nav className="hidden flex-1 items-center justify-center gap-1 lg:flex">
-            {NAV_ITEMS.map((item) => (
+            {navItems.map((item) => (
               <NavLink key={item.to} to={item.to} className={linkClass} end={item.to === '/'}>
                 {item.label}
               </NavLink>
@@ -171,7 +176,7 @@ komak@pawbaku.az
 
         {menuOpen && (
           <nav className="border-t border-ink/8 px-4 py-3 lg:hidden">
-            {NAV_ITEMS.map((item) => (
+            {navItems.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}

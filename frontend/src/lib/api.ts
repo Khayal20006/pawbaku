@@ -1,5 +1,16 @@
 import axios, { AxiosError } from 'axios'
-import type { ApiErrorBody, ListingDto, Page, ReportDto, ReportInput, ReportStatus } from './types'
+import type {
+  ApiErrorBody,
+  ApplicationDto,
+  ListingDto,
+  ListingInput,
+  Page,
+  PetDto,
+  PetInput,
+  ReportDto,
+  ReportInput,
+  ReportStatus,
+} from './types'
 
 const TOKEN_KEY = 'pawbaku.token'
 
@@ -88,6 +99,17 @@ export async function fetchListings(query: ListingQuery = {}): Promise<ListingDt
   return data.content
 }
 
+export async function fetchListing(id: number | string): Promise<ListingDto> {
+  const { data } = await api.get<ListingDto>(`/api/listings/${id}`)
+  return data
+}
+
+/** Creating a listing requires an authenticated account (POST is behind the JWT). */
+export async function createListing(input: ListingInput): Promise<ListingDto> {
+  const { data } = await api.post<ListingDto>('/api/listings', input)
+  return data
+}
+
 /** Public feed of street-animal help reports, newest first. */
 export async function fetchReports(): Promise<ReportDto[]> {
   const { data } = await api.get<ReportDto[]>('/api/reports')
@@ -112,5 +134,55 @@ export async function advanceReportStatus(
   note?: string,
 ): Promise<ReportDto> {
   const { data } = await api.patch<ReportDto>(`/api/reports/${id}/status`, { status, note })
+  return data
+}
+
+/** The caller's own reports (requires an authenticated account). */
+export async function fetchMyReports(): Promise<ReportDto[]> {
+  const { data } = await api.get<ReportDto[]>('/api/reports/mine')
+  return data
+}
+
+/** Upload an image (JPG/PNG/WEBP, ≤5 MB) and get back its public URL. */
+export async function uploadImage(file: File): Promise<string> {
+  const body = new FormData()
+  body.append('file', file)
+  const { data } = await api.post<{ url: string }>('/api/uploads', body, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return data.url
+}
+
+/* ------------------------------------------------------------------ adoptions */
+
+/** Public list of adoptable pets, newest first. */
+export async function fetchAdoptions(): Promise<PetDto[]> {
+  const { data } = await api.get<PetDto[]>('/api/adoptions')
+  return data
+}
+
+/** Community offer: any logged-in user can add an adoptable pet. */
+export async function createPet(input: PetInput): Promise<PetDto> {
+  const { data } = await api.post<PetDto>('/api/adoptions', input)
+  return data
+}
+
+/** Apply for a pet — requires an account. */
+export async function applyToAdopt(petId: number | string, message?: string): Promise<ApplicationDto> {
+  const { data } = await api.post<ApplicationDto>(`/api/adoptions/${petId}/applications`, {
+    message: message?.trim() || undefined,
+  })
+  return data
+}
+
+/** The caller's own adoption applications. */
+export async function fetchMyApplications(): Promise<ApplicationDto[]> {
+  const { data } = await api.get<ApplicationDto[]>('/api/adoptions/mine/applications')
+  return data
+}
+
+/** Backend liveness probe (public, no auth). */
+export async function fetchHealth(): Promise<{ status: string }> {
+  const { data } = await api.get<{ status: string }>('/api/health')
   return data
 }

@@ -38,6 +38,12 @@ public class ReportController {
         return reportService.findById(id);
     }
 
+    /** The caller's own reports, newest first — the profile "my reports" section. */
+    @GetMapping("/mine")
+    public List<ReportResponse> mine() {
+        return reportService.mine();
+    }
+
     @PostMapping
     public ResponseEntity<ReportResponse> create(@Valid @RequestBody ReportRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(reportService.create(request));

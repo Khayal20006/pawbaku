@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { Kicker, LinkButton, SectionTitle } from '../components/ui'
+import { ImageUpload, Kicker, LinkButton, SectionTitle } from '../components/ui'
 import ReportTracker from '../components/ReportTracker'
 import { PawBadge, PawGlyph } from '../lib/paw'
 import { BAKU_DISTRICTS } from '../lib/format'
@@ -48,6 +48,7 @@ export default function ReportPage() {
   const [mood, setMood] = useState<(typeof MOODS)[number]['value']>('Zədəli')
   const [district, setDistrict] = useState(BAKU_DISTRICTS[0])
   const [description, setDescription] = useState('')
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [done, setDone] = useState<TrackerReport | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -76,8 +77,10 @@ export default function ReportPage() {
       const created = await createReport({
         ...input,
         species: speciesToMarketCode(species),
+        photoUrl: photoUrl ?? undefined,
       })
       setDone(toTrackerReport(created))
+      setPhotoUrl(null)
     } catch {
       // Backend unreachable — keep the flow working offline in this browser.
       const created = addReport(input)
@@ -221,6 +224,20 @@ export default function ReportPage() {
               <span className="field-hint">Ən azı 5 simvol — yer dəqiq olsa bildiriş daha tez həll olur.</span>
             </label>
 
+            <div>
+              <span className="field-label">Şəkil (əlverişli)</span>
+              <ImageUpload value={photoUrl} onChange={setPhotoUrl} disabled={!user} />
+              {!user && (
+                <p className="mt-2 text-xs font-medium text-ink/50">
+                  Şəkil üçün{' '}
+                  <Link to="/login" className="link-underline font-extrabold text-brand-700 hover:text-ink">
+                    daxil olun
+                  </Link>
+                  .
+                </p>
+              )}
+            </div>
+
             {error && (
               <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm font-bold text-rose-700 ring-1 ring-rose-200" role="alert">
                 {error}
@@ -297,10 +314,10 @@ export default function ReportPage() {
           </div>
 
           <div className="rounded-[2rem] border-2 border-dashed border-ink/25 bg-white px-6 py-5">
-            <Kicker>Yaxın pillə</Kicker>
+            <Kicker>İndi aktiv</Kicker>
             <p className="mt-2 text-sm font-medium leading-relaxed text-ink/55">
-              Bildiriş artıq canlı axınla sinxronlaşır; qoşulma mümkün olmasa, bu brauzerdə
-              qeydə alınır. Şəkil yükləmə və xəritədə dəqiq yer növbəti pillədə açılacaq.
+              Bildiriş canlı axınla sinxronlaşır, şəkil yüklənir; qoşulma mümkün olmasa,
+              bu brauzerdə yadda qalır.
             </p>
             <Link
               to="/listings"
