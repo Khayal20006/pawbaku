@@ -72,7 +72,16 @@ public class UserService {
             user.setFullName(blankToNull(request.fullName()));
         }
         if (request.phoneNumber() != null) {
-            user.setPhoneNumber(blankToNull(request.phoneNumber()));
+            String phoneNumber = AuthService.normalizePhone(request.phoneNumber());
+            if (phoneNumber != null) {
+                userRepository.findByPhoneNumber(phoneNumber)
+                        .filter(existing -> !existing.getId().equals(id))
+                        .ifPresent(existing -> {
+                            throw new ConflictException(
+                                    "Bu telefon nömrəsi artıq istifadə olunub: " + phoneNumber);
+                        });
+            }
+            user.setPhoneNumber(phoneNumber);
         }
 
         if (current.getRole() == User.Role.ADMIN) {

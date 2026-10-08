@@ -53,6 +53,10 @@ public class AuthService {
         if (userRepository.existsByEmailIgnoreCase(email)) {
             throw new ConflictException("Bu email artıq istifadə olunub: " + email);
         }
+        String phoneNumber = normalizePhone(request.phoneNumber());
+        if (phoneNumber != null && userRepository.existsByPhoneNumber(phoneNumber)) {
+            throw new ConflictException("Bu telefon nömrəsi artıq istifadə olunub: " + phoneNumber);
+        }
 
         if (request.verificationCode() == null || request.verificationCode().isBlank()) {
             throw new BadRequestException(
@@ -65,7 +69,7 @@ public class AuthService {
                 .email(email)
                 .password(passwordEncoder.encode(request.password()))
                 .fullName(blankToNull(request.fullName()))
-                .phoneNumber(blankToNull(request.phoneNumber()))
+                .phoneNumber(phoneNumber)
                 .role(User.Role.CITIZEN)
                 .active(true)
                 .build();
@@ -102,5 +106,15 @@ public class AuthService {
         }
         String trimmed = value.trim();
         return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    /** Boş deyilsə boşluq/qısa xətt/sürgü simvollarını silir ki, unikallıq yoxlaması düzgün işləsin. */
+    static String normalizePhone(String value) {
+        String trimmed = blankToNull(value);
+        if (trimmed == null) {
+            return null;
+        }
+        String normalized = trimmed.replaceAll("[\\s\\-()]", "");
+        return normalized.isEmpty() ? null : normalized;
     }
 }
