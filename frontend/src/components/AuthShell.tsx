@@ -4,7 +4,7 @@ import { Kicker } from './ui'
 import { PawGlyph } from '../lib/paw'
 
 const POINTS = [
-  'Elanı xəritədə bir dəqiqəyə verin',
+  'Elanı yerləşdirin — sistem uyğunluq balı versin',
   'Sistem uyğunluq balı hesablayır',
   'Köməyin axınını real vaxtda izləyin',
 ]

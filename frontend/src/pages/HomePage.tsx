@@ -32,7 +32,7 @@ const MODULES: {
     ring: 'text-brand-600 bg-brand-500',
     tag: 'Elan + Matcher',
     title: 'İtkin & Tapılmış',
-    text: 'Elan, şəkil, xəritə. Sistem növ, rəng, ölçü, məsafə və vaxta görə uyğunluq balı hesablayır — hədd 65.',
+    text: 'Elan, şəkil, yer koordinatı. Sistem növ, rəng, ölçü, məsafə və vaxta görə uyğunluq balı hesablayır — hədd 65.',
     to: '/listings',
     stat: '4 aktiv elan',
   },
@@ -522,7 +522,8 @@ export default function HomePage() {
                 <span className="text-stroke-white">başla</span>
               </h2>
               <p className="mt-4 max-w-md text-base font-semibold leading-relaxed text-white/80">
-                Qeydiyyat bir dəqiqədən az çəkir — qeyd et, bildir, izlə. Hər pəncə bir ümiddir.
+                Qeydiyyat email doğrulaması ilə bir neçə addımda tamamlanır — qeyd et, bildir, izlə.
+                Hər pəncə bir ümiddir.
               </p>
             </div>
             <div className="flex flex-wrap gap-3">

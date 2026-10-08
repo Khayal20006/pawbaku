@@ -72,7 +72,7 @@ export default function TrackPage() {
         <SectionTitle
           kicker="Canlı axın"
           title="Yüklənir…"
-          description="Bildirişin izi getirilir — bir dəqiqə."
+          description="Bildirişin izi yüklənir…"
         />
       </div>
     )
