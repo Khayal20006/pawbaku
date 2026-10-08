@@ -221,19 +221,6 @@ export function KindTag({ kind }: { kind: ListingKind }) {
   )
 }
 
-export interface Stat {
-  value: number
-  suffix?: string
-  label: string
-  hint: string
-}
-
-export const HERO_STATS: Stat[] = [
-  { value: 24, suffix: '/7', label: 'Canlı axın', hint: 'Platforma istənilən saat aktivdir' },
-  { value: 3, label: 'Modul', hint: 'İtkin, kömək, övladlığa götürmə' },
-  { value: 50, suffix: ' m', label: 'Uyğunluq həssaslığı', hint: 'Yer radiusu və vaxt çəkisi' },
-]
-
 /** Simple type-safe chip list used by the marquee ticker. */
 export const renderMarquee = (items: readonly string[]): ReactNode[] =>
   items.map((item, index) => (

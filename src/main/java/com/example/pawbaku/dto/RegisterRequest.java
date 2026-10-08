@@ -25,5 +25,9 @@ public record RegisterRequest(
         String fullName,
 
         @Size(max = 20, message = "Telefon 20 simvoldan uzun ola bilməz")
-        String phoneNumber) {
+        String phoneNumber,
+
+        @NotBlank(message = "Email doğrulama kodu tələb olunur — əvvəlcə 'Kod göndər' deyin")
+        @Pattern(regexp = "^[0-9]{6}$", message = "Kod 6 rəqəm olmalıdır")
+        String verificationCode) {
 }

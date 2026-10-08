@@ -6,6 +6,7 @@ import type {
   ListingDto,
   ListingInput,
   ListingStatus,
+  OtpSendResult,
   Page,
   PetDto,
   PetInput,
@@ -204,6 +205,12 @@ export async function setListingStatus(
   status: ListingStatus,
 ): Promise<ListingDto> {
   const { data } = await api.patch<ListingDto>(`/api/listings/${id}/status`, { status })
+  return data
+}
+
+/** Request an email verification code (demo mode echoes it back; production emails it). */
+export async function sendOtp(email: string): Promise<OtpSendResult> {
+  const { data } = await api.post<OtpSendResult>('/api/auth/otp/send', { email })
   return data
 }
 

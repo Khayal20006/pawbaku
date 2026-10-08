@@ -151,6 +151,15 @@ export interface RegisterInput {
   password: string
   fullName?: string
   phoneNumber?: string
+  verificationCode: string
+}
+
+/** Result of sending an email verification code. */
+export interface OtpSendResult {
+  expiresInSeconds: number
+  dev: boolean
+  /** Only present in demo mode (SMTP off) so the local flow can be exercised. */
+  previewCode?: string
 }
 
 export interface UserUpdateInput {

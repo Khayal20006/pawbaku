@@ -52,6 +52,20 @@ spring:
     problemdetails:
       enabled: false
 
+  # SMTP xidməti (JavaMailSender). Boş/yarısız olduqda heç bir məktub göndərilmir —
+  # EmailOtpService "demo rejimi" ilə işləyir (kodu cavabda qaytarır).
+  mail:
+    host: ${SMTP_HOST:}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 server:
   port: ${SERVER_PORT:8080}
   error:
@@ -67,6 +81,14 @@ pawbaku:
       secret: ${JWT_SECRET}
       issuer: ${JWT_ISSUER:https://api.pawbaku.az}
       expiration-minutes: ${JWT_EXPIRATION_MINUTES:180}
+  mail:
+    enabled: ${MAIL_ENABLED:false}
+    from: ${MAIL_FROM:noreply@pawbaku.az}
+    smtp:
+      host: ${SMTP_HOST:}
+      port: ${SMTP_PORT:587}
+      username: ${SMTP_USERNAME:}
+      password: ${SMTP_PASSWORD:}
   cors:
     allowed-origins: ${CORS_ORIGINS:http://localhost:5173,http://localhost:3000,http://localhost:4173}
   bootstrap:

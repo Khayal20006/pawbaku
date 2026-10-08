@@ -3,6 +3,7 @@ package com.example.pawbaku.service;
 import com.example.pawbaku.dto.AuthResponse;
 import com.example.pawbaku.dto.LoginRequest;
 import com.example.pawbaku.dto.RegisterRequest;
+import com.example.pawbaku.exception.BadRequestException;
 import com.example.pawbaku.exception.ConflictException;
 import com.example.pawbaku.model.User;
 import com.example.pawbaku.repository.UserRepository;
@@ -26,15 +27,18 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final EmailOtpService emailOtpService;
 
     public AuthService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
                        AuthenticationManager authenticationManager,
-                       JwtService jwtService) {
+                       JwtService jwtService,
+                       EmailOtpService emailOtpService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.emailOtpService = emailOtpService;
     }
 
     /** Self-service registration always produces a citizen account. */
@@ -49,6 +53,12 @@ public class AuthService {
         if (userRepository.existsByEmailIgnoreCase(email)) {
             throw new ConflictException("Bu email artıq istifadə olunub: " + email);
         }
+
+        if (request.verificationCode() == null || request.verificationCode().isBlank()) {
+            throw new BadRequestException(
+                    "Email doğrulama kodu tələb olunur — əvvəlcə 'Kod göndər' deyin");
+        }
+        emailOtpService.verify(email, request.verificationCode());
 
         User user = User.builder()
                 .username(username)

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { Counter, Kicker, LinkButton, Reveal } from '../components/ui'
-import { FEED, HERO_STATS, MARQUEE_ITEMS, PawBadge, PawGlyph, renderMarquee } from '../lib/paw'
+import { FEED, MARQUEE_ITEMS, PawBadge, PawGlyph, renderMarquee } from '../lib/paw'
 import type { FeedItem } from '../lib/paw'
 import { getStoredReports, mergeFeed } from '../lib/store'
 import { fetchAdoptions, fetchListings, fetchReports } from '../lib/api'
@@ -73,10 +73,18 @@ export default function HomePage() {
   const { user } = useAuth()
   // null = still loading → show the built-in demo tiles; the server feed replaces them once loaded.
   const [serverFeed, setServerFeed] = useState<FeedItem[] | null>(null)
-  const [live, setLive] = useState<{ listings: number; adoptions: number; topMatch: number }>({
+  const [live, setLive] = useState<{
+    loaded: boolean
+    listings: number
+    adoptions: number
+    topMatch: number
+    topName: string | null
+  }>({
+    loaded: false,
     listings: 0,
     adoptions: 0,
     topMatch: 0,
+    topName: null,
   })
 
   useEffect(() => {
@@ -88,10 +96,20 @@ export default function HomePage() {
         const activeListings = listings.filter(
           (l) => l.status === 'ACTIVE' || l.status === 'REOPENED',
         ).length
+        let topMatch = 0
+        let topName: string | null = null
+        for (const listing of listings) {
+          if (listing.matchScore > topMatch) {
+            topMatch = listing.matchScore
+            topName = listing.animal.name ?? null
+          }
+        }
         setLive({
+          loaded: true,
           listings: activeListings,
           adoptions: pets.length,
-          topMatch: Math.max(0, ...listings.map((l) => l.matchScore)),
+          topMatch,
+          topName,
         })
       })
       .catch(() => {
@@ -101,6 +119,13 @@ export default function HomePage() {
       active = false
     }
   }, [])
+
+  // Real, backend-computed figures only — no static placeholders.
+  const heroStats = [
+    { value: live.listings, tone: 'brand', label: 'Aktiv elan', hint: 'itkin & tapılmış bazasında' },
+    { value: live.adoptions, tone: 'sea', label: 'Bala ev axtarır', hint: 'övladlığa götürmə siyahısında' },
+    { value: live.topMatch, tone: 'sun', label: 'Ən yüksək uyğunluq balı', hint: 'aktiv elanlar arasında' },
+  ] as const
 
   const base = serverFeed === null ? FEED : serverFeed
   const feed = mergeFeed(base, getStoredReports())
@@ -195,7 +220,14 @@ export default function HomePage() {
                   />
                   <figcaption className="absolute inset-x-3 bottom-3 flex items-center justify-center">
                     <span className="inline-flex min-w-0 items-center gap-2 rounded-full border-2 border-ink bg-white px-3.5 py-1 text-xs font-extrabold whitespace-nowrap text-ink">
-                      “Reks” korgi — <span className="text-brand-600">uyğunluq balı canlı</span>
+                      {live.loaded && live.topMatch > 0 && live.topName === 'Reks' ? (
+                        <>
+                          “Reks” korgi —{' '}
+                          <span className="text-brand-600">uyğunluq balı canlı</span>
+                        </>
+                      ) : (
+                        <span className="text-brand-600">uyğunluq balı canlı</span>
+                      )}
                       <span className="relative flex size-2 shrink-0">
                         <span className="absolute inline-flex size-full animate-ping rounded-full bg-sea-400 opacity-70" />
                         <span className="relative inline-flex size-2 rounded-full bg-sea-400" />
@@ -218,13 +250,15 @@ export default function HomePage() {
                   <PawGlyph className="size-8 sm:size-10" />
                 </span>
 
-                <span
-                  className="absolute -bottom-5 right-6 flex items-center gap-2 rounded-full border-2 border-ink bg-sea-500 px-4 py-2 text-xs font-extrabold text-white shadow-pop"
-                  aria-hidden
-                >
-                  <span className="text-[10px] uppercase tracking-wider">Uyğunlaşdırma</span>
-                  <Counter to={live.topMatch} /> bal
-                </span>
+                {live.loaded && live.topMatch > 0 && (
+                  <span
+                    className="absolute -bottom-5 right-6 flex items-center gap-2 rounded-full border-2 border-ink bg-sea-500 px-4 py-2 text-xs font-extrabold text-white shadow-pop"
+                    aria-hidden
+                  >
+                    <span className="text-[10px] uppercase tracking-wider">Uyğunlaşdırma</span>
+                    <Counter to={live.topMatch} /> bal
+                  </span>
+                )}
               </div>
             </Reveal>
           </div>
@@ -232,22 +266,21 @@ export default function HomePage() {
           {/* --------------------------------------------------------------- stats */}
           <Reveal delay={80}>
             <div className="mt-20 grid gap-4 sm:grid-cols-3">
-              {HERO_STATS.map((stat, index) => (
+              {heroStats.map((stat) => (
                 <div
                   key={stat.label}
                   className="pop-stick flex items-center gap-4 rounded-3xl border-2 border-ink bg-white px-6 py-5"
                 >
                   <span
                     className={`display text-4xl tabular-nums ${
-                      index === 0
+                      stat.tone === 'brand'
                         ? 'text-brand-600'
-                        : index === 1
+                        : stat.tone === 'sea'
                           ? 'text-sea-600'
                           : 'text-sun-600'
                     }`}
                   >
-                    <Counter to={stat.value} />
-                    {stat.suffix}
+                    {live.loaded ? <Counter to={stat.value} /> : '—'}
                   </span>
                   <span>
                     <span className="block text-[13px] font-extrabold leading-tight text-ink">{stat.label}</span>
