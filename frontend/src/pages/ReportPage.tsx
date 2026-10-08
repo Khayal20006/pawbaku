@@ -128,7 +128,7 @@ export default function ReportPage() {
           title="Qeyd alındı"
           description={
             offline
-              ? 'Server hazırda əlçatmazdır — bildiriş yalnız bu brauzerdə saxlanıldı (demo rejimi).'
+              ? 'Server hazırda əlçatmazdır — bildiriş yalnız bu brauzerdə saxlanıldı.'
               : 'Bildirişiniz canlı axına əlavə olundu. Status moderator təsdiqi ilə izləniləcək.'
           }
         />

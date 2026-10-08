@@ -25,9 +25,10 @@ public class PawUserDetailsService implements UserDetailsService {
     }
 
     @Transactional(readOnly = true)
-    public User loadEntity(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsernameIgnoreCase(username)
-                .orElseThrow(() -> new UsernameNotFoundException("İstifadəçi tapılmadı: " + username));
+    public User loadEntity(String identifier) throws UsernameNotFoundException {
+        return userRepository.findByEmailIgnoreCase(identifier)
+                .or(() -> userRepository.findByUsernameIgnoreCase(identifier))
+                .orElseThrow(() -> new UsernameNotFoundException("İstifadəçi tapılmadı: " + identifier));
     }
 
     /**

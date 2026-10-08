@@ -197,13 +197,6 @@ export default function RegisterPage() {
             </p>
           )}
 
-          {otpState.previewCode && (
-            <p className="mt-3 rounded-lg bg-sea-50 px-3 py-2 text-xs font-semibold text-sea-800">
-              Demo rejimi — SMTP söndürülüb, məktub göndərilmir. Bu sınaq kodu:{' '}
-              <span className="font-extrabold tracking-widest">{otpState.previewCode}</span>
-            </p>
-          )}
-
           {showCodeField && (
             <div className="mt-3">
               <Field

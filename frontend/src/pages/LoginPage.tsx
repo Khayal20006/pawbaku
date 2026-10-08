@@ -51,7 +51,7 @@ export default function LoginPage() {
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && <Alert tone="error">{error}</Alert>}
 
-        <Field label="İstifadəçi adı">
+        <Field label="Email və ya istifadəçi adı">
           <input
             className="field-input"
             value={username}
@@ -59,7 +59,7 @@ export default function LoginPage() {
             autoComplete="username"
             autoFocus
             required
-            placeholder="aysel"
+            placeholder="email və ya istifadəçi adı"
           />
         </Field>
 
@@ -80,20 +80,6 @@ export default function LoginPage() {
           {!submitting && <span aria-hidden>→</span>}
         </Button>
       </form>
-
-      <div className="mt-5 rounded-xl bg-ink/4 px-4 py-3 text-xs text-ink/55 ring-1 ring-ink/8">
-        <p className="font-semibold text-ink/70">Demo hesabları</p>
-        <ul className="mt-1 space-y-0.5">
-          <li>
-            Administrator: <code className="font-mono">admin</code> / <code className="font-mono">Admin123!</code>
-          </li>
-          <li>
-            Könüllü: <code className="font-mono">vasif</code> · baytar:{' '}
-            <code className="font-mono">nigar</code> — parol hər ikisində{' '}
-            <code className="font-mono">PawBakuDemo1!</code>
-          </li>
-        </ul>
-      </div>
     </AuthShell>
   )
 }

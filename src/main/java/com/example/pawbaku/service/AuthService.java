@@ -77,15 +77,16 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest request) {
-        String username = request.username().trim();
+        String identifier = request.username().trim();
         try {
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(username, request.password()));
+                    new UsernamePasswordAuthenticationToken(identifier, request.password()));
         } catch (BadCredentialsException ex) {
             throw new BadCredentialsException("İstifadəçi adı və ya parol düzgün deyil");
         }
 
-        User user = userRepository.findByUsernameIgnoreCase(username)
+        User user = userRepository.findByEmailIgnoreCase(identifier)
+                .or(() -> userRepository.findByUsernameIgnoreCase(identifier))
                 .orElseThrow(() -> new BadCredentialsException("İstifadəçi adı və ya parol düzgün deyil"));
 
         if (!user.isActive()) {
