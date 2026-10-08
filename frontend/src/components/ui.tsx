@@ -6,13 +6,6 @@ import {
   type ReactNode,
 } from 'react'
 import { Link } from 'react-router-dom'
-import {
-  PRIORITY_LABELS,
-  PRIORITY_STYLES,
-  STATUS_LABELS,
-  STATUS_STYLES,
-} from '../lib/format'
-import type { ComplaintStatus, Priority } from '../lib/types'
 
 /* ------------------------------------------------------------------ primitives */
 
@@ -83,21 +76,7 @@ export function Kicker({ children, className = '' }: { children: ReactNode; clas
   return <p className={`kicker ${className}`}>{children}</p>
 }
 
-/** Brand monogram used by the header and the auth split-panel. */
-export function BrandMark({ size = 'sm' }: { size?: 'sm' | 'lg' | 'xl' }) {
-  const box = size === 'sm' ? 'size-9 rounded-lg' : size === 'lg' ? 'size-12 rounded-xl' : 'size-16 rounded-2xl'
-  const icon = size === 'sm' ? 'size-5' : size === 'lg' ? 'size-7' : 'size-9'
-  return (
-    <span
-      className={`inline-flex ${box} items-center justify-center bg-ink text-parchment ring-1 ring-white/15`}
-    >
-      <svg viewBox="0 0 24 24" className={`${icon}`} fill="none" stroke="currentColor" strokeWidth="1.7">
-        <path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-5h6v5" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    </span>
-  )
-}
-
+/** Slim uppercase micro-label used above section titles. */
 export function Card({
   className = '',
   children,
@@ -180,14 +159,6 @@ export function Badge({ className = '', children }: { className?: string; childr
       {children}
     </span>
   )
-}
-
-export function StatusBadge({ status }: { status: ComplaintStatus }) {
-  return <Badge className={STATUS_STYLES[status]}>{STATUS_LABELS[status]}</Badge>
-}
-
-export function PriorityBadge({ priority }: { priority: Priority }) {
-  return <Badge className={PRIORITY_STYLES[priority]}>{PRIORITY_LABELS[priority]}</Badge>
 }
 
 export function EmptyState({

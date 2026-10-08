@@ -1,14 +1,12 @@
 export type Role = 'CITIZEN' | 'VOLUNTEER' | 'SHELTER_STAFF' | 'VET' | 'MODERATOR' | 'ADMIN'
 
-export type ComplaintStatus =
-  | 'PENDING'
-  | 'UNDER_REVIEW'
-  | 'IN_PROGRESS'
-  | 'RESOLVED'
-  | 'REJECTED'
-  | 'CANCELLED'
+export type AnimalSpecies = 'DOG' | 'CAT' | 'OTHER'
+export type AnimalSize = 'SMALL' | 'MEDIUM' | 'LARGE'
+export type AnimalGender = 'MALE' | 'FEMALE' | 'UNKNOWN'
 
-export type Priority = 'LOW' | 'NORMAL' | 'HIGH' | 'URGENT'
+export type ListingKind = 'LOST' | 'FOUND'
+export type ListingStatus = 'ACTIVE' | 'MATCHED' | 'CLOSED' | 'EXPIRED' | 'REOPENED'
+export type ReportStatus = 'REPORTED' | 'VERIFIED' | 'VOLUNTEER_ASSIGNED' | 'VET_CARE' | 'RESOLVED'
 
 export interface User {
   id: number
@@ -28,99 +26,88 @@ export interface AuthResponse {
   user: User
 }
 
-export interface Category {
+/** Animal profile as returned by the backend. */
+export interface AnimalDto {
   id: number
-  name: string
-  description: string | null
-  departmentName: string
-  contactEmail: string | null
-  estimatedResolutionHours: number
-  active: boolean
-  openComplaints: number
+  name: string | null
+  species: AnimalSpecies
+  breed: string | null
+  color: string | null
+  size: AnimalSize | null
+  gender: AnimalGender
+  ageMonths: number | null
+  photoUrl: string | null
+  notes: string | null
   createdAt: string
 }
 
-export interface CategoryInput {
-  name: string
-  description?: string
-  departmentName: string
-  contactEmail?: string
-  estimatedResolutionHours?: number
-  active?: boolean
-}
-
-export interface CommentAuthor {
+/** İtkin / Tapılmış elanı as returned by the backend. */
+export interface ListingDto {
   id: number
-  username: string
-  fullName: string | null
-  phoneNumber: string | null
-  role: Role
-}
-
-export interface Comment {
-  id: number
-  message: string
-  previousStatus: ComplaintStatus | null
-  newStatus: ComplaintStatus | null
-  internal: boolean
-  createdAt: string
-  author: CommentAuthor
-}
-
-export interface Complaint {
-  id: number
-  referenceCode: string
-  title: string
-  description: string
-  imageUrl: string | null
+  kind: ListingKind
+  status: ListingStatus
   latitude: number
   longitude: number
   district: string | null
   address: string | null
-  priority: Priority
-  status: ComplaintStatus
-  closed: boolean
-  allowedTransitions: ComplaintStatus[]
-  resolutionNote: string | null
-  resolvedAt: string | null
+  description: string | null
   createdAt: string
-  updatedAt: string
-  categoryId: number | null
-  categoryName: string
-  departmentName: string | null
-  userId: number
-  userName: string
-  userFullName: string | null
-  assignedToId: number | null
-  assignedToName: string | null
-  comments: Comment[] | null
+  createdBy: User
+  animal: AnimalDto
+  matchScore: number
 }
 
-export interface ComplaintInput {
+export interface ListingInput {
+  kind: ListingKind
+  latitude: number
+  longitude: number
+  district: string
+  address: string
+  description?: string
+  animal: {
+    name?: string
+    species: AnimalSpecies
+    breed?: string
+    color?: string
+    size?: AnimalSize
+    gender?: AnimalGender
+    ageMonths?: number
+    photoUrl?: string
+  }
+}
+
+/** Street-animal help report as returned by the backend feed/tracker. */
+export interface ReportDto {
+  id: number
   title: string
   description: string
-  categoryName: string
-  latitude: number
-  longitude: number
-  district?: string
-  address?: string
-  imageUrl?: string
-  priority?: Priority
-}
-
-export interface ComplaintMarker {
-  id: number
-  referenceCode: string
-  title: string
-  status: ComplaintStatus
-  priority: Priority
-  latitude: number
-  longitude: number
-  district: string | null
-  categoryName: string
+  species: AnimalSpecies
+  status: ReportStatus
+  district: string
+  address: string | null
+  latitude: number | null
+  longitude: number | null
+  photoUrl: string | null
+  reporter: User
+  verifiedBy: User | null
+  volunteer: User | null
+  vet: User | null
   createdAt: string
+  updatedAt: string
 }
 
+export interface ReportInput {
+  title: string
+  description: string
+  species: AnimalSpecies
+  district: string
+  address?: string
+  latitude?: number
+  longitude?: number
+  photoUrl?: string
+}
+
+/** Stable paged envelope shared by every list endpoint. */
 export interface Page<T> {
   content: T[]
   page: number
@@ -129,18 +116,6 @@ export interface Page<T> {
   totalPages: number
   first: boolean
   last: boolean
-}
-
-export interface Statistics {
-  total: number
-  open: number
-  closed: number
-  byStatus: Record<string, number>
-  byPriority: Record<string, number>
-  byCategory: Record<string, number>
-  byDistrict: Record<string, number>
-  averageResolutionHours: number
-  generatedAt: string
 }
 
 export interface ApiErrorBody {
@@ -171,10 +146,4 @@ export interface UserUpdateInput {
   phoneNumber?: string
   role?: Role
   active?: boolean
-}
-
-export interface UploadResponse {
-  url: string
-  contentType: string
-  size: number
 }

@@ -39,7 +39,7 @@ export default function AuthShell({
               <span className="flex size-9 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-pop">
                 <PawGlyph className="size-5" />
               </span>
-              <span className="display block text-sm text-white">Paw-Baku</span>
+              <span className="display block text-sm text-white">PawBaku</span>
             </div>
 
             <h2 className="display mt-10 text-3xl leading-tight">

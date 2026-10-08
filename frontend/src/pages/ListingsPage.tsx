@@ -9,7 +9,7 @@ type Filter = (typeof FILTERS)[number]
 
 const KIND_LABEL: Record<ListingKind, string> = {
   LOST: 'İtkin',
-  FOUND: 'Tapılıb',
+  FOUND: 'Tapılmış',
 }
 
 const MATCH_RING: Record<number, string> = {
@@ -139,7 +139,7 @@ export default function ListingsPage() {
 
       {visible.length === 0 && (
         <div className="mt-8 rounded-[2rem] border-2 border-dashed border-ink/25 bg-white px-6 py-14 text-center">
-          <p className="display text-2xl text-ink">Bu filtrdə elan yoxdur</p>
+          <p className="display text-2xl text-ink">Bu filtr üzrə elan yoxdur</p>
           <p className="mx-auto mt-1 max-w-sm text-sm font-medium text-ink/55">
             Filtrləri dəyişin və ya{' '}
             <Link to="/report" className="link-underline font-extrabold text-brand-700 hover:text-ink">

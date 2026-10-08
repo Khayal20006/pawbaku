@@ -1,36 +1,4 @@
-import type { ComplaintStatus, Priority, Role } from './types'
-
-export const STATUS_LABELS: Record<ComplaintStatus, string> = {
-  PENDING: 'Gözləyir',
-  UNDER_REVIEW: 'Nəzərdə',
-  IN_PROGRESS: 'İcra edildi',
-  RESOLVED: 'Həll edildi',
-  REJECTED: 'Rədd edildi',
-  CANCELLED: 'Ləğv edildi',
-}
-
-export const STATUS_STYLES: Record<ComplaintStatus, string> = {
-  PENDING: 'bg-amber-50 text-amber-700 ring-amber-200',
-  UNDER_REVIEW: 'bg-sky-50 text-sky-700 ring-sky-200',
-  IN_PROGRESS: 'bg-brand-50 text-brand-700 ring-brand-200',
-  RESOLVED: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
-  REJECTED: 'bg-rose-50 text-rose-700 ring-rose-200',
-  CANCELLED: 'bg-slate-100 text-slate-600 ring-slate-300',
-}
-
-export const PRIORITY_LABELS: Record<Priority, string> = {
-  LOW: 'Aşağı',
-  NORMAL: 'Normal',
-  HIGH: 'Yüksək',
-  URGENT: 'Təcili',
-}
-
-export const PRIORITY_STYLES: Record<Priority, string> = {
-  LOW: 'bg-slate-100 text-slate-600 ring-slate-300',
-  NORMAL: 'bg-sky-50 text-sky-700 ring-sky-200',
-  HIGH: 'bg-orange-50 text-orange-700 ring-orange-200',
-  URGENT: 'bg-rose-50 text-rose-700 ring-rose-200',
-}
+import type { Role } from './types'
 
 export const ROLE_LABELS: Record<Role, string> = {
   CITIZEN: 'Vətəndaş',
@@ -40,15 +8,6 @@ export const ROLE_LABELS: Record<Role, string> = {
   MODERATOR: 'Moderator',
   ADMIN: 'Administrator',
 }
-
-export const STATUS_ORDER: ComplaintStatus[] = [
-  'PENDING',
-  'UNDER_REVIEW',
-  'IN_PROGRESS',
-  'RESOLVED',
-  'REJECTED',
-  'CANCELLED',
-]
 
 export const BAKU_DISTRICTS = [
   'Xəzər',
@@ -105,19 +64,6 @@ export function formatRelative(value: string | null | undefined): string {
   const months = Math.round(days / 30)
   if (months < 12) return `${months} ay əvvəl`
   return `${Math.round(months / 12)} il əvvəl`
-}
-
-export function formatHours(hours: number): string {
-  if (hours <= 0) return '—'
-  if (hours < 24) return `${Math.round(hours)} saat`
-  const days = hours / 24
-  return `${days % 1 === 0 ? days : days.toFixed(1)} gün`
-}
-
-export function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`
-  return `${(bytes / 1024 / 1024).toFixed(1)} MB`
 }
 
 export function initials(fullName: string | null, fallback: string): string {

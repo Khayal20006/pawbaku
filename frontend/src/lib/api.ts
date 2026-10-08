@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios'
 import type { ApiErrorBody } from './types'
 
-const TOKEN_KEY = 'city-service.token'
+const TOKEN_KEY = 'pawbaku.token'
 
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY)
@@ -57,7 +57,7 @@ api.interceptors.response.use(
       if (!window.location.pathname.startsWith('/login')) {
         window.location.assign('/login')
       }
-      return Promise.reject(new ApiError('Sessi sona çatdı. Yenidən daxil olun.', status))
+      return Promise.reject(new ApiError('Sessiya sona çatdı. Yenidən daxil olun.', status))
     }
 
     if (body?.message) {
@@ -68,6 +68,6 @@ api.interceptors.response.use(
       return Promise.reject(new ApiError('Serverə qoşulma mümkün deyil.', 0))
     }
 
-    return Promise.reject(new ApiError('Gözənilməz xəta baş verdi.', status || 500))
+    return Promise.reject(new ApiError('Gözlənilməz xəta baş verdi.', status || 500))
   },
 )
