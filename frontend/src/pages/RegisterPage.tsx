@@ -179,11 +179,11 @@ export default function RegisterPage() {
             <Button
               type="button"
               size="md"
-              disabled={otpState.cooldown > 0 || otpState.sending}
+              disabled={(otpState.cooldown > 0 && otpMatchesEmail) || otpState.sending}
               onClick={handleSendOtp}
               loading={otpState.sending}
             >
-              {otpState.cooldown > 0
+              {otpState.cooldown > 0 && otpMatchesEmail
                 ? `${otpState.cooldown} s sonra`
                 : otpMatchesEmail
                   ? 'Yenidən göndər'

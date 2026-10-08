@@ -9,8 +9,10 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      '/api': { target: 'http://localhost:8080', changeOrigin: true },
-      '/uploads': { target: 'http://localhost:8080', changeOrigin: true },
+      // Point at the compose backend (127.0.0.1:8081) so the dev server shares the same
+      // database and real SMTP config; a locally-run backend on 8080 has no mail settings.
+      '/api': { target: 'http://localhost:8081', changeOrigin: true },
+      '/uploads': { target: 'http://localhost:8081', changeOrigin: true },
     },
   },
 })
