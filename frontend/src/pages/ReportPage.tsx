@@ -51,6 +51,7 @@ export default function ReportPage() {
   const [photoUrl, setPhotoUrl] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [done, setDone] = useState<TrackerReport | null>(null)
+  const [offline, setOffline] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [advancing, setAdvancing] = useState(false)
   const [advanceError, setAdvanceError] = useState<string | null>(null)
@@ -79,10 +80,17 @@ export default function ReportPage() {
         species: speciesToMarketCode(species),
         photoUrl: photoUrl ?? undefined,
       })
+      setOffline(false)
       setDone(toTrackerReport(created))
       setPhotoUrl(null)
-    } catch {
-      // Backend unreachable — keep the flow working offline in this browser.
+    } catch (cause) {
+      // Only a genuine network failure (status 0) falls back to this browser's
+      // offline store; a server rejection (validation, 403, …) is shown as-is.
+      if (cause instanceof ApiError && cause.status !== 0) {
+        setError(cause.message)
+        return
+      }
+      setOffline(true)
       const created = addReport(input)
       setDone(toTrackerReport(created[0]))
     } finally {
@@ -118,7 +126,11 @@ export default function ReportPage() {
         <SectionTitle
           kicker="Küçə heyvanına kömək"
           title="Qeyd alındı"
-          description="Bildirişiniz canlı axına əlavə olundu. Status moderator təsdiqi ilə izləniləcək."
+          description={
+            offline
+              ? 'Server hazırda əlçatmazdır — bildiriş yalnız bu brauzerdə saxlanıldı (demo rejimi).'
+              : 'Bildirişiniz canlı axına əlavə olundu. Status moderator təsdiqi ilə izləniləcək.'
+          }
         />
 
         <div className="mx-auto max-w-xl overflow-hidden rounded-[2rem] border-2 border-ink bg-white shadow-lift">

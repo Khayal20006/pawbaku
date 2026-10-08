@@ -5,6 +5,8 @@ import java.util.List;
 import com.example.pawbaku.dto.ListingRequest;
 import com.example.pawbaku.dto.ListingResponse;
 import com.example.pawbaku.dto.PageResponse;
+import com.example.pawbaku.exception.ForbiddenException;
+import com.example.pawbaku.exception.InvalidStateTransitionException;
 import com.example.pawbaku.exception.ResourceNotFoundException;
 import com.example.pawbaku.model.Animal;
 import com.example.pawbaku.model.Listing;
@@ -82,6 +84,32 @@ public class ListingService {
                 .createdBy(creator)
                 .animal(animal)
                 .build();
+        listing = listingRepository.save(listing);
+        return ListingResponse.of(listing, matchService.bestMatch(listing));
+    }
+
+    /** Close or reopen a listing — only the owner or staff may do it. */
+    @Transactional
+    public ListingResponse changeStatus(Long id, Listing.Status target) {
+        User actor = currentUserService.require();
+        Listing listing = listingRepository.findWithAnimalById(id)
+                .orElseThrow(() -> ResourceNotFoundException.of("Elan", id));
+
+        boolean owner = listing.getCreatedBy().getId().equals(actor.getId());
+        if (!owner && !actor.isStaff()) {
+            throw new ForbiddenException("Elanı yalnız sahibi və ya personal bağlaya/aça bilər");
+        }
+
+        Listing.Status from = listing.getStatus();
+        boolean allowed = (from == Listing.Status.ACTIVE && target == Listing.Status.CLOSED)
+                || (from == Listing.Status.REOPENED && target == Listing.Status.CLOSED)
+                || (from == Listing.Status.CLOSED && target == Listing.Status.REOPENED);
+        if (!allowed) {
+            throw new InvalidStateTransitionException(
+                    "Bu status keçidi mümkün deyil: " + from + " → " + target, List.of(target.name()));
+        }
+
+        listing.setStatus(target);
         listing = listingRepository.save(listing);
         return ListingResponse.of(listing, matchService.bestMatch(listing));
     }

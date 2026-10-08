@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Button, EmptyState, LinkButton, PageLoader, SectionTitle } from '../components/ui'
-import { fetchListing } from '../lib/api'
+import { ApiError, fetchListing, setListingStatus } from '../lib/api'
+import { useAuth } from '../context/AuthContext'
 import { KindTag, PawBadge, PawGlyph } from '../lib/paw'
 import { formatDateTime } from '../lib/format'
 import type { ListingDto, ListingStatus as BackendListingStatus } from '../lib/types'
@@ -24,9 +25,23 @@ function DetailRow({ label, value }: { label: string; value: string }) {
   )
 }
 
-function ListingDetailView({ listing }: { listing: ListingDto }) {
+function ListingDetailView({
+  listing,
+  canManage = false,
+  busy = false,
+  manageError = null,
+  onToggleStatus,
+}: {
+  listing: ListingDto
+  canManage?: boolean
+  busy?: boolean
+  manageError?: string | null
+  onToggleStatus?: () => void
+}) {
   const animal = listing.animal
   const creator = listing.createdBy
+  const closable = listing.status === 'ACTIVE' || listing.status === 'REOPENED'
+  const reopenable = listing.status === 'CLOSED'
   return (
     <div>
       <div className="overflow-hidden rounded-[2.5rem] border-2 border-ink bg-white shadow-card">
@@ -113,6 +128,23 @@ function ListingDetailView({ listing }: { listing: ListingDto }) {
             )}
 
             <div className="mt-auto flex flex-wrap gap-3 pt-6">
+              {canManage && (closable || reopenable) && (
+                <>
+                  <button
+                    type="button"
+                    onClick={onToggleStatus}
+                    disabled={busy}
+                    className={`pop-stick inline-flex items-center gap-2 rounded-full border-2 border-ink px-5 py-2.5 text-sm font-extrabold disabled:cursor-not-allowed disabled:opacity-60 ${
+                      closable ? 'bg-rose-600 text-white' : 'bg-sea-600 text-white'
+                    }`}
+                  >
+                    {busy ? 'İşlənir…' : closable ? 'Elanı bağla' : 'Yenidən aç'}
+                  </button>
+                  <span className="self-center text-xs font-bold text-ink/45">
+                    {closable ? 'Bağlandıqda aktiv hovuzdan çıxır.' : 'Bağlanmış elanı yenidən aktivləşdir.'}
+                  </span>
+                </>
+              )}
               <LinkButton to="/report" className="pop-stick">
                 <PawGlyph className="size-4" /> Kömək edin
               </LinkButton>
@@ -123,6 +155,11 @@ function ListingDetailView({ listing }: { listing: ListingDto }) {
                 Bütün elanlar
               </Link>
             </div>
+            {manageError && (
+              <p className="mt-3 rounded-2xl bg-rose-50 px-4 py-2.5 text-sm font-bold text-rose-700 ring-1 ring-rose-200" role="alert">
+                {manageError}
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -130,7 +167,7 @@ function ListingDetailView({ listing }: { listing: ListingDto }) {
       <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-[2rem] border-2 border-dashed border-ink/25 bg-white px-6 py-6">
         <p className="max-w-xl text-xs font-semibold leading-relaxed text-ink/55">
           Bu elan sizə aiddir və ya heyvanı tanıyırsınız? Əlaqə məlumatı yuxarıdakı profildədir; sahib
-          tapıldıqda elan moderator tərəfindən <strong>Uyğunlaşdı</strong> statusuna keçirilir.
+          tapıldıqda sahib özü elanı <strong>bağlaya</strong> bilər — elan aktiv uyğunluq hovuzundan çıxır.
         </p>
         <Link
           to="/listings/new"
@@ -145,8 +182,11 @@ function ListingDetailView({ listing }: { listing: ListingDto }) {
 
 export default function ListingDetailPage() {
   const { id } = useParams<{ id: string }>()
+  const { user } = useAuth()
   const [listing, setListing] = useState<ListingDto | null>(null)
   const [error, setError] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [manageError, setManageError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!id) return
@@ -163,6 +203,21 @@ export default function ListingDetailPage() {
     }
   }, [id])
 
+  async function handleToggleStatus() {
+    if (!listing) return
+    const target = listing.status === 'CLOSED' ? 'REOPENED' : 'CLOSED'
+    setBusy(true)
+    setManageError(null)
+    try {
+      const updated = await setListingStatus(listing.id, target)
+      setListing(updated)
+    } catch (cause) {
+      setManageError(cause instanceof ApiError ? cause.message : 'Status dəyişdirilə bilmədi.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
   if (error) {
     return (
       <EmptyState
@@ -175,6 +230,9 @@ export default function ListingDetailPage() {
 
   if (!listing) return <PageLoader label="Elan yüklənir…" />
 
+  const canManage =
+    !!listing && !!user && (user.id === listing.createdBy.id || ['ADMIN', 'MODERATOR'].includes(user.role))
+
   return (
     <div className="animate-fade-in">
       <SectionTitle
@@ -182,7 +240,13 @@ export default function ListingDetailPage() {
         title="Elan məlumatı"
         action={<Button variant="secondary" onClick={() => window.history.back()}>← Geri</Button>}
       />
-      <ListingDetailView listing={listing} />
+      <ListingDetailView
+        listing={listing}
+        canManage={canManage}
+        busy={busy}
+        manageError={manageError}
+        onToggleStatus={handleToggleStatus}
+      />
     </div>
   )
 }

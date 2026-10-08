@@ -6,6 +6,7 @@ import com.example.pawbaku.dto.ApplicationResponse;
 import com.example.pawbaku.dto.PetRequest;
 import com.example.pawbaku.dto.PetResponse;
 import com.example.pawbaku.exception.ConflictException;
+import com.example.pawbaku.exception.ForbiddenException;
 import com.example.pawbaku.exception.ResourceNotFoundException;
 import com.example.pawbaku.model.AdoptablePet;
 import com.example.pawbaku.model.AdoptionApplication;
@@ -86,6 +87,55 @@ public class AdoptionService {
         return applicationRepository.findByApplicantIdOrderByIdDesc(actor.getId()).stream()
                 .map(ApplicationResponse::of)
                 .toList();
+    }
+
+    /** Applications received on the caller's own pets (staff: every application). */
+    @Transactional(readOnly = true)
+    public List<ApplicationResponse> received() {
+        User actor = currentUserService.require();
+        List<AdoptionApplication> applications = actor.isStaff()
+                ? applicationRepository.findAllWithDetails()
+                : applicationRepository.findByPetCreatedByIdOrderByIdDesc(actor.getId());
+        return applications.stream().map(ApplicationResponse::of).toList();
+    }
+
+    /** Owner or staff approve/reject a pending application; approval adopts the pet. */
+    @Transactional
+    public ApplicationResponse review(Long applicationId, AdoptionApplication.ApplicationStatus target) {
+        if (target == AdoptionApplication.ApplicationStatus.PENDING) {
+            throw new ConflictException("Yalnız təsdiqləmək və ya rədd etmək mümkündür");
+        }
+        User actor = currentUserService.require();
+        AdoptionApplication application = requireApplication(applicationId);
+        if (application.getStatus() != AdoptionApplication.ApplicationStatus.PENDING) {
+            throw new ConflictException("Bu ərizə artıq cavablanıb");
+        }
+        AdoptablePet pet = application.getPet();
+        boolean owner = pet.getCreatedBy().getId().equals(actor.getId());
+        if (!owner && !actor.isStaff()) {
+            throw new ForbiddenException("Yalnız heyvanın sahibi və ya personal ərizəyə cavab verə bilər");
+        }
+
+        application.setStatus(target);
+        application = applicationRepository.save(application);
+        if (target == AdoptionApplication.ApplicationStatus.APPROVED) {
+            pet.setStatus(AdoptablePet.PetStatus.ADOPTED);
+            petRepository.save(pet);
+            List<AdoptionApplication> rival = applicationRepository.findPendingByPetId(pet.getId());
+            for (AdoptionApplication pending : rival) {
+                if (!pending.getId().equals(application.getId())) {
+                    pending.setStatus(AdoptionApplication.ApplicationStatus.REJECTED);
+                    applicationRepository.save(pending);
+                }
+            }
+        }
+        return ApplicationResponse.of(application);
+    }
+
+    /** Pet listing for the CALLER who offers it — used to decide application review rights. */
+    private AdoptionApplication requireApplication(Long id) {
+        return applicationRepository.findById(id)
+                .orElseThrow(() -> ResourceNotFoundException.of("Övladlığa götürmə ərizəsi", id));
     }
 
     private AdoptablePet requirePet(Long id) {

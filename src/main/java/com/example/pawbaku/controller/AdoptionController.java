@@ -3,6 +3,7 @@ package com.example.pawbaku.controller;
 import java.util.List;
 
 import com.example.pawbaku.dto.ApplicationResponse;
+import com.example.pawbaku.dto.ApplicationStatusRequest;
 import com.example.pawbaku.dto.PetRequest;
 import com.example.pawbaku.dto.PetResponse;
 import com.example.pawbaku.service.AdoptionService;
@@ -11,6 +12,7 @@ import jakarta.validation.constraints.Size;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -57,6 +59,19 @@ public class AdoptionController {
     @GetMapping("/mine/applications")
     public List<ApplicationResponse> mine() {
         return adoptionService.mine();
+    }
+
+    /** Applications received on the caller's pets (staff: every application). */
+    @GetMapping("/applications/received")
+    public List<ApplicationResponse> received() {
+        return adoptionService.received();
+    }
+
+    /** Owner or staff approve/reject a pending application. */
+    @PatchMapping("/applications/{id}/status")
+    public ApplicationResponse review(@PathVariable Long id,
+                                      @Valid @RequestBody ApplicationStatusRequest request) {
+        return adoptionService.review(id, request.status());
     }
 
     public record ApplicationRequest(@Size(max = 1200, message = "Mesaj ən çox 1200 simvol ola bilər") String message) {

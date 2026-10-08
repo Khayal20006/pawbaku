@@ -1,16 +1,23 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { api, ApiError, fetchMyApplications, fetchMyReports } from '../lib/api'
+import {
+  api,
+  ApiError,
+  fetchMyApplications,
+  fetchMyReports,
+  fetchReceivedApplications,
+  reviewApplication,
+} from '../lib/api'
 import { useAuth } from '../context/AuthContext'
 import { ROLE_LABELS, formatDate, formatRelative } from '../lib/format'
-import type { ApplicationDto, ReportDto, User } from '../lib/types'
+import type { ApplicationDto, ApplicationStatus, ReportDto, User } from '../lib/types'
 import { Alert, Badge, Button, Card, CardHeader, EmptyState, Field, SectionTitle } from '../components/ui'
 import { PawBadge, PawGlyph } from '../lib/paw'
 
 const STAFF_ROLES = ['ADMIN', 'MODERATOR', 'SHELTER_STAFF']
 const APP_STATUS_LABEL = { PENDING: 'Gözləyir', APPROVED: 'Təsdiqləndi', REJECTED: 'Rədd edildi' } as const
 
-type Tab = 'overview' | 'reports' | 'applications'
+type Tab = 'overview' | 'reports' | 'applications' | 'received'
 
 export default function ProfilePage() {
   const { user, refresh } = useAuth()
@@ -25,6 +32,9 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false)
   const [reports, setReports] = useState<ReportDto[] | null>(null)
   const [applications, setApplications] = useState<ApplicationDto[] | null>(null)
+  const [received, setReceived] = useState<ApplicationDto[] | null>(null)
+  const [reviewingId, setReviewingId] = useState<number | null>(null)
+  const [reviewError, setReviewError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!user) return
@@ -35,10 +45,26 @@ export default function ProfilePage() {
     fetchMyApplications()
       .then((items) => active && setApplications(items))
       .catch(() => active && setApplications([]))
+    fetchReceivedApplications()
+      .then((items) => active && setReceived(items))
+      .catch(() => active && setReceived([]))
     return () => {
       active = false
     }
   }, [user])
+
+  async function handleReview(application: ApplicationDto, status: ApplicationStatus) {
+    setReviewingId(application.id)
+    setReviewError(null)
+    try {
+      const updated = await reviewApplication(application.id, status)
+      setReceived((items) => (items ?? []).map((item) => (item.id === updated.id ? updated : item)))
+    } catch (cause) {
+      setReviewError(cause instanceof ApiError ? cause.message : 'Ərizə cavablanmadı.')
+    } finally {
+      setReviewingId(null)
+    }
+  }
 
   if (!user) return null
 
@@ -65,6 +91,7 @@ export default function ProfilePage() {
   const tabs: { key: Tab; label: string; count?: number }[] = [
     { key: 'reports', label: 'Bildirişlərim', count: reports?.length },
     { key: 'applications', label: 'Ərizələrim', count: applications?.length },
+    { key: 'received', label: 'Gələn ərizələr', count: received?.length },
     { key: 'overview', label: 'Məlumatlar' },
   ]
 
@@ -126,6 +153,77 @@ export default function ProfilePage() {
           </button>
         ))}
       </div>
+
+      {tab === 'received' && (
+        <div className="space-y-4">
+          {received === null && (
+            <div className="card p-8 text-center text-sm font-medium text-ink/50">Yüklənir…</div>
+          )}
+          {reviewError && <Alert tone="error">{reviewError}</Alert>}
+          {received?.length === 0 && (
+            <Card>
+              <EmptyState
+                title="Gələn ərizə yoxdur"
+                description="Elanlarınıza göndərilən övladlığa götürmə ərizələri burada görünəcək. Təsdiq olunan ərizə heyvanı övladlığa verilmiş sayır."
+                action={<Link to="/adopt" className="link-underline text-sm font-extrabold text-brand-700 hover:text-ink">Övladlığa götürmə →</Link>}
+              />
+            </Card>
+          )}
+          {(received ?? []).map((application) => (
+            <article key={application.id} className="card p-5">
+              <div className="flex flex-wrap items-center gap-3">
+                <p className="display text-lg text-ink">{application.petName}</p>
+                <Badge
+                  className={
+                    application.status === 'PENDING'
+                      ? 'bg-sun-400/40 text-ink ring-sun-500/40'
+                      : application.status === 'APPROVED'
+                        ? 'bg-emerald-600/10 text-emerald-700 ring-emerald-600/25'
+                        : 'bg-rose-600/10 text-rose-700 ring-rose-600/25'
+                  }
+                >
+                  {APP_STATUS_LABEL[application.status]}
+                </Badge>
+                <span className="ml-auto text-xs font-bold text-ink/40">
+                  {formatRelative(application.createdAt)}
+                </span>
+              </div>
+              <p className="mt-1 text-sm font-extrabold text-ink/75">
+                {application.applicant.fullName || application.applicant.username}
+              </p>
+              {application.message && (
+                <p className="mt-2 text-sm font-medium leading-relaxed text-ink/60">{application.message}</p>
+              )}
+              {application.status === 'PENDING' && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Button
+                    size="sm"
+                    loading={reviewingId === application.id}
+                    onClick={() => void handleReview(application, 'APPROVED')}
+                  >
+                    Təsdiqlə
+                  </Button>
+                  <button
+                    type="button"
+                    disabled={reviewingId === application.id}
+                    onClick={() => void handleReview(application, 'REJECTED')}
+                    className="inline-flex items-center rounded-full border-2 border-ink bg-white px-4 py-1.5 text-xs font-extrabold text-ink transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Rədd et
+                  </button>
+                </div>
+              )}
+              {application.status !== 'PENDING' && (
+                <p className="mt-2 text-xs font-semibold text-ink/45">
+                  {application.status === 'APPROVED'
+                    ? 'Təsdiqləndi — heyvan övladlığa verilmiş sayılır.'
+                    : 'Rədd edildi — digər ərizələr nəzərdən keçirilə bilər.'}
+                </p>
+              )}
+            </article>
+          ))}
+        </div>
+      )}
 
       {tab === 'overview' && (
         <div className="space-y-5">
@@ -258,8 +356,8 @@ export default function ProfilePage() {
                 <p className="mt-2 text-sm font-medium leading-relaxed text-ink/60">{application.message}</p>
               )}
               <p className="mt-3 text-xs font-semibold leading-relaxed text-ink/45">
-                Əlaqə üçün profil panelindən məlumatlarınız yenilənmiş olmalıdır; nəticə out-of-band
-                bildirilir.
+                Cavab statusu bu səhifədə yenilənir — təsdiqlənmiş ərizə heyvanın övladlığa
+                verilməsi ilə nəticələnir.
               </p>
             </article>
           ))}

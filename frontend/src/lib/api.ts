@@ -2,8 +2,10 @@ import axios, { AxiosError } from 'axios'
 import type {
   ApiErrorBody,
   ApplicationDto,
+  ApplicationStatus,
   ListingDto,
   ListingInput,
+  ListingStatus,
   Page,
   PetDto,
   PetInput,
@@ -178,6 +180,30 @@ export async function applyToAdopt(petId: number | string, message?: string): Pr
 /** The caller's own adoption applications. */
 export async function fetchMyApplications(): Promise<ApplicationDto[]> {
   const { data } = await api.get<ApplicationDto[]>('/api/adoptions/mine/applications')
+  return data
+}
+
+/** Applications received on the caller's own pets (staff: every application). */
+export async function fetchReceivedApplications(): Promise<ApplicationDto[]> {
+  const { data } = await api.get<ApplicationDto[]>('/api/adoptions/applications/received')
+  return data
+}
+
+/** Owner or staff approve/reject a pending adoption application. */
+export async function reviewApplication(
+  id: number,
+  status: ApplicationStatus,
+): Promise<ApplicationDto> {
+  const { data } = await api.patch<ApplicationDto>(`/api/adoptions/applications/${id}/status`, { status })
+  return data
+}
+
+/** Bir elanın statusunu dəyiş (sahib/personal): bağla və ya yenidən aç. */
+export async function setListingStatus(
+  id: number | string,
+  status: ListingStatus,
+): Promise<ListingDto> {
+  const { data } = await api.patch<ListingDto>(`/api/listings/${id}/status`, { status })
   return data
 }
 

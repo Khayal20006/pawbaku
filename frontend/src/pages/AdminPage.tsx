@@ -59,6 +59,8 @@ export default function AdminPage() {
     )
   }
 
+  const canAdvanceFront = user.role === 'ADMIN' || user.role === 'MODERATOR'
+
   async function advance(report: ReportDto) {
     setBusyId(report.id)
     setActionError(null)
@@ -101,7 +103,11 @@ export default function AdminPage() {
         <Card>
           <CardHeader
             title="Son bildirişlər"
-            subtitle="Növbəti pilləyə keçirmək üçün düyməni basın — ardıcıllıq məcbiridir."
+            subtitle={
+              canAdvanceFront
+                ? 'Növbəti pilləyə keçirmək üçün düyməni basın — ardıcıllıq məcbiridir.'
+                : 'Panelə baxış rejimindəsiniz — keçid düymələri yalnız moderator/admin üçündür.'
+            }
           />
           {actionError && <div className="px-5 pt-4"><Alert tone="error">{actionError}</Alert></div>}
           <div className="divide-y divide-ink/8">
@@ -112,7 +118,7 @@ export default function AdminPage() {
             )}
             {(reports ?? []).map((report) => {
               const stuck = report.status === 'RESOLVED'
-              const allowed = !stuck
+              const allowed = !stuck && canAdvanceFront
               return (
                 <div key={report.id} className="flex flex-wrap items-center gap-4 px-5 py-4">
                   <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-600/10 text-xs font-extrabold text-brand-700">
@@ -144,6 +150,9 @@ export default function AdminPage() {
                   >
                     {busyId === report.id ? 'İşlənir…' : stuck ? 'Bağlanıb' : 'Növbəti →'}
                   </button>
+                  {!canAdvanceFront && !stuck && (
+                    <span className="text-[11px] font-bold text-ink/40">Yalnız moderator/admin keçirə bilər</span>
+                  )}
                 </div>
               )
             })}
