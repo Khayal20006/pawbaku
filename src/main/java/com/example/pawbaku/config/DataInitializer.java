@@ -44,6 +44,7 @@ public class DataInitializer implements ApplicationRunner {
     private final ReportRepository reportRepository;
     private final ReportEventRepository eventRepository;
     private final BootstrapProperties properties;
+    private final DemoProperties demoProperties;
 
     public DataInitializer(UserRepository userRepository,
                            PasswordEncoder passwordEncoder,
@@ -51,7 +52,8 @@ public class DataInitializer implements ApplicationRunner {
                            ListingRepository listingRepository,
                            ReportRepository reportRepository,
                            ReportEventRepository eventRepository,
-                           BootstrapProperties properties) {
+                           BootstrapProperties properties,
+                           DemoProperties demoProperties) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.animalRepository = animalRepository;
@@ -59,13 +61,14 @@ public class DataInitializer implements ApplicationRunner {
         this.reportRepository = reportRepository;
         this.eventRepository = eventRepository;
         this.properties = properties;
+        this.demoProperties = demoProperties;
     }
 
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
         User admin = seedAdmin();
-        if (properties.demo().seed()) {
+        if (demoProperties.seed()) {
             seedDemoData(admin);
         }
     }
@@ -208,18 +211,15 @@ public class DataInitializer implements ApplicationRunner {
                 .build());
     }
 
-    /** Bootstrap settings bound from {@code pawbaku.*}. */
-    @ConfigurationProperties(prefix = "pawbaku")
-    public record BootstrapProperties(Admin admin, Demo demo) {
+    /** Bootstrap settings bound from {@code pawbaku.bootstrap.*}. */
+    @ConfigurationProperties(prefix = "pawbaku.bootstrap")
+    public record BootstrapProperties(Admin admin) {
 
         public BootstrapProperties {
             if (admin == null) {
                 throw new IllegalStateException("pawbaku.bootstrap.admin tələb olunur");
             }
             admin.validate();
-            if (demo == null) {
-                demo = new Demo(true);
-            }
         }
 
         public record Admin(String username, String password, String email) {
@@ -246,9 +246,10 @@ public class DataInitializer implements ApplicationRunner {
                 }
             }
         }
+    }
 
-        /** Demo data (users, animals, listings, reports) loaded idempotently on startup. */
-        public record Demo(boolean seed) {
-        }
+    /** Demo-data toggle bound from {@code pawbaku.demo.seed}. */
+    @ConfigurationProperties(prefix = "pawbaku.demo")
+    public record DemoProperties(boolean seed) {
     }
 }
