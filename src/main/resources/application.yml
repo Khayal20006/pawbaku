@@ -74,6 +74,8 @@ pawbaku:
       # Required: the very first admin password is never stored in the repository.
       password: ${BOOTSTRAP_ADMIN_PASSWORD}
       email: ${BOOTSTRAP_ADMIN_EMAIL:admin@pawbaku.az}
+  demo:
+    seed: ${DEMO_SEED:true}
 
 logging:
   level:
