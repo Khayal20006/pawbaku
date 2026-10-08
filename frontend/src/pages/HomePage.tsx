@@ -193,16 +193,13 @@ export default function HomePage() {
                     fetchPriority="high"
                     className="aspect-[4/3] w-full bg-brand-100 object-cover"
                   />
-                  <figcaption className="absolute inset-x-3 bottom-3 flex items-center justify-between gap-2">
-                    <span className="rounded-full border-2 border-ink bg-white px-3 py-1 text-xs font-extrabold text-ink">
-                      “Reks” korgi — <span className="text-brand-600">uyğunluq balı canlı hesablanır</span>
-                    </span>
-                    <span className="flex items-center gap-1.5 rounded-full border-2 border-ink bg-ink px-3 py-1 text-[11px] font-extrabold text-white">
-                      <span className="relative flex size-2">
+                  <figcaption className="absolute inset-x-3 bottom-3 flex items-center justify-center">
+                    <span className="inline-flex min-w-0 items-center gap-2 rounded-full border-2 border-ink bg-white px-3.5 py-1 text-xs font-extrabold whitespace-nowrap text-ink">
+                      “Reks” korgi — <span className="text-brand-600">uyğunluq balı canlı</span>
+                      <span className="relative flex size-2 shrink-0">
                         <span className="absolute inline-flex size-full animate-ping rounded-full bg-sea-400 opacity-70" />
                         <span className="relative inline-flex size-2 rounded-full bg-sea-400" />
                       </span>
-                      Canlı
                     </span>
                   </figcaption>
                 </figure>
