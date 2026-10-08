@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { initials } from '../lib/format'
 
 const NAV_ITEMS = [
-  { to: '/', label: 'Ana' },
+  { to: '/', label: 'Əsas' },
   { to: '/listings', label: 'İtkin & Tapılmış' },
   { to: '/adopt', label: 'Övladlığa götürmə' },
   { to: '/report', label: 'Kömək edin' },
