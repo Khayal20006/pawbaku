@@ -2,16 +2,29 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import ReportTracker from '../components/ReportTracker'
 import { LinkButton, SectionTitle } from '../components/ui'
+import { useAuth } from '../context/AuthContext'
 import { ApiError } from '../lib/api'
+import type { ReportStatus, Role } from '../lib/types'
 import {
   advanceTrackerReport,
+  isLocalReport,
   loadTrackerReport,
   resetTrackerReport,
   type TrackerReport,
 } from '../lib/reports'
 
+/** Who may take the NEXT step from the given report status. */
+const NEXT_STEP_ROLES: Record<ReportStatus, Role[]> = {
+  REPORTED: ['MODERATOR', 'ADMIN'],
+  VERIFIED: ['VOLUNTEER', 'MODERATOR', 'ADMIN'],
+  VOLUNTEER_ASSIGNED: ['VET', 'MODERATOR', 'ADMIN'],
+  VET_CARE: ['VET', 'MODERATOR', 'ADMIN'],
+  RESOLVED: [],
+}
+
 export default function TrackPage() {
   const { id } = useParams<{ id: string }>()
+  const { user } = useAuth()
   const [report, setReport] = useState<TrackerReport | null>(null)
   const [loading, setLoading] = useState(true)
   const [advancing, setAdvancing] = useState(false)
@@ -81,6 +94,10 @@ export default function TrackPage() {
     )
   }
 
+  const canAdvance =
+    isLocalReport(report.id) ||
+    (!!user && report.status !== 'RESOLVED' && NEXT_STEP_ROLES[report.status].includes(user.role))
+
   return (
     <div className="animate-fade-in">
       <SectionTitle
@@ -104,6 +121,7 @@ export default function TrackPage() {
             report={report}
             busy={advancing}
             advanceError={advanceError}
+            canAdvance={canAdvance}
             onAdvance={handleAdvance}
             onReset={handleReset}
           />

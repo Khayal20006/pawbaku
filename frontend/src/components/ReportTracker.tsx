@@ -1,23 +1,28 @@
 import { PawBadge, PawGlyph } from '../lib/paw'
 import { REPORT_FLOW } from '../lib/store'
+import { formatDateTime } from '../lib/format'
 import type { TrackerReport } from '../lib/reports'
 
 interface ReportTrackerProps {
   report: TrackerReport
   busy?: boolean
   advanceError?: string | null
+  canAdvance?: boolean
   onAdvance?: () => Promise<void> | void
   onReset?: () => void
 }
 
 /**
- * Lifecycle timeline for a street-animal report. The parent owns the report state
- * and decides how to advance: localStorage (offline demo) or the reports API.
+ * Lifecycle timeline for a street-animal report. Reached steps show the real
+ * audit actor (when the server events are present) and the "İrəli apar" action
+ * is role-gated on the parent side — a viewer without the right role only sees
+ * who must take the next step.
  */
 export default function ReportTracker({
   report,
   busy = false,
   advanceError = null,
+  canAdvance = true,
   onAdvance,
   onReset,
 }: ReportTrackerProps) {
@@ -31,25 +36,49 @@ export default function ReportTracker({
         <span className="flex size-11 items-center justify-center rounded-full border-2 border-ink bg-brand-600 text-base font-extrabold text-white shadow-pop">
           {report.avatar}
         </span>
-        <div>
-          <p className="display text-xl leading-tight text-ink">{report.title}</p>
+        <div className="min-w-0">
+          <p className="display truncate text-xl leading-tight text-ink">{report.title}</p>
           <p className="text-xs font-bold text-ink/50">
             {report.district} · {report.time}
           </p>
         </div>
-        <span className="ml-auto">
+        <span className="ml-auto shrink-0">
           <PawBadge status={report.status} />
         </span>
       </div>
+
+      {report.photo && (
+        <div className="relative mt-4 overflow-hidden rounded-2xl border-2 border-ink/10">
+          <img
+            src={report.photo}
+            alt=""
+            className="aspect-[16/9] w-full bg-brand-100 object-cover"
+            loading="lazy"
+          />
+        </div>
+      )}
 
       <p className="mt-4 rounded-2xl bg-paper px-4 py-3 text-sm font-medium leading-relaxed text-ink/70">
         {report.description}
       </p>
 
+      {report.address && (
+        <p className="mt-2 flex items-center gap-2 text-xs font-bold text-ink/55">
+          <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2">
+            <path
+              d="M12 21c-4.5-3.4-7-6.4-7-9.6a7 7 0 1 1 14 0c0 3.2-2.5 6.2-7 9.6zM10 11h4"
+              strokeLinecap="round"
+            />
+          </svg>
+          {report.address}
+        </p>
+      )}
+
       <ol className="mt-6 space-y-1">
         {REPORT_FLOW.map((step, index) => {
           const reached = index <= currentIndex
           const active = index === currentIndex && !finished
+          const audit = report.events?.find((event) => event.to === step.status)
           return (
             <li key={step.status} className="relative flex gap-4 pb-4">
               {index < REPORT_FLOW.length - 1 && (
@@ -69,14 +98,24 @@ export default function ReportTracker({
               >
                 {reached && <span className="size-2 rounded-full bg-brand-500" />}
               </span>
-              <div className="flex flex-1 flex-wrap items-center justify-between gap-x-2 gap-y-1">
-                <div>
-                  <p className={`text-sm font-semibold ${reached ? 'text-ink' : 'text-ink/40'}`}>
-                    {step.label}
-                  </p>
-                  <p className="text-[11px] font-bold text-ink/40">{step.by}</p>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+                  <div className="min-w-0">
+                    <p className={`text-sm font-semibold ${reached ? 'text-ink' : 'text-ink/40'}`}>
+                      {step.label}
+                    </p>
+                    {audit && audit.actor ? (
+                      <p className="text-[11px] font-bold text-ink/55">
+                        {audit.actor}
+                        {audit.note ? ` — ${audit.note}` : ''}
+                        <span className="ml-1 text-ink/35">{formatDateTime(audit.createdAt)}</span>
+                      </p>
+                    ) : (
+                      <p className="text-[11px] font-bold text-ink/40">{step.by}</p>
+                    )}
+                  </div>
+                  <PawBadge status={step.status} />
                 </div>
-                <PawBadge status={step.status} />
               </div>
             </li>
           )
@@ -108,8 +147,13 @@ export default function ReportTracker({
                 <p className="text-sm font-extrabold text-ink">
                   {nextStep.by}: {nextStep.act}
                 </p>
+                {!canAdvance && (
+                  <p className="mt-0.5 text-[11px] font-bold text-ink/45">
+                    Bu addımı yalnız {nextStep.by} və ya nümayəndə heyəti edə bilər.
+                  </p>
+                )}
               </div>
-              {onAdvance && (
+              {onAdvance && canAdvance && (
                 <button
                   type="button"
                   onClick={() => void onAdvance()}

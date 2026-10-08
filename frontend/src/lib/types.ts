@@ -78,6 +78,16 @@ export interface ListingInput {
   }
 }
 
+/** One append-only audit row of the report lifecycle. */
+export interface ReportEventDto {
+  id: number
+  fromStatus: ReportStatus | null
+  toStatus: ReportStatus
+  actor: string | null
+  note: string | null
+  createdAt: string
+}
+
 /** Street-animal help report as returned by the backend feed/tracker. */
 export interface ReportDto {
   id: number
@@ -96,6 +106,7 @@ export interface ReportDto {
   vet: User | null
   createdAt: string
   updatedAt: string
+  events: ReportEventDto[]
 }
 
 export interface ReportInput {

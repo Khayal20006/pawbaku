@@ -22,6 +22,18 @@ export interface TrackerReport {
   district: string
   time: string
   avatar: string
+  photo?: string | null
+  address?: string | null
+  events?: TrackerEvent[]
+}
+
+/** A single audit entry: who moved the report, from which to which status. */
+export interface TrackerEvent {
+  from: ReportStatus | null
+  to: ReportStatus
+  actor: string | null
+  note: string | null
+  createdAt: string
 }
 
 export const isLocalReport = (id: string): boolean => id.startsWith('rep-')
@@ -48,6 +60,15 @@ export function toTrackerReport(report: StoredReport | ReportDto): TrackerReport
     district: dto.district,
     time: formatRelative(dto.createdAt),
     avatar: (dto.reporter.fullName?.trim() || dto.reporter.username).slice(0, 1).toUpperCase() || 'S',
+    photo: dto.photoUrl,
+    address: dto.address,
+    events: (dto.events ?? []).map((event) => ({
+      from: event.fromStatus,
+      to: event.toStatus,
+      actor: event.actor,
+      note: event.note,
+      createdAt: event.createdAt,
+    })),
   }
 }
 
